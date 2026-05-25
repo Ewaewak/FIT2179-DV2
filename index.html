@@ -582,10 +582,10 @@ const melbGeoJSON = {
 // ─────────────────────── CHART: MAP ───────────────────────
 vegaEmbed('#chart-map', cfg({
   width:"container", height:440,
-  projection:{type:"mercator"},
+  projection:{type:"mercator", center:[144.972, -37.820], scale:95000},
   layer:[
     {
-      data:{values:melbGeoJSON.features, format:{type:"json", property:"features"}},
+      data:{values:melbGeoJSON.features},
       mark:{type:"geoshape", fill:"#1a1d2b", stroke:"#3a3f5c", strokeWidth:1}
     },
     {
@@ -667,11 +667,13 @@ vegaEmbed('#chart-patronage2024', cfg({
 
 // ─────────────────────── CHART: SMALL MULTIPLES ───────────────────────
 vegaEmbed('#chart-small-multiples', cfg({
-  width:220, height:120,
+  width:"container", height:140,
   data:{values:patronageTrend},
-  facet:{field:"station",type:"nominal",columns:4,
-         header:{labelFont:"Barlow Condensed",labelFontSize:13,labelFontWeight:700,labelColor:C.text}},
+  facet:{field:"station",type:"nominal",columns:2,
+         header:{labelFont:"Barlow Condensed",labelFontSize:13,labelFontWeight:700,labelColor:C.text,labelPadding:8}},
+  resolve:{scale:{y:"independent"}},
   spec:{
+    width:"container",
     layer:[
       {
         mark:{type:"area",opacity:0.15},
@@ -793,30 +795,44 @@ vegaEmbed('#chart-team-crowds', cfg({
 }), {actions:false});
 
 // ─────────────────────── CHART: HOME VS AWAY SCATTER ───────────────────────
+// Add per-team label offsets to prevent overlap
+const teamOffsets = [
+  {team:"Collingwood",home_avg:64905,away_avg:53467,venue:"M.C.G.",dx:5,dy:-10},
+  {team:"Carlton",home_avg:58311,away_avg:52975,venue:"M.C.G.",dx:-60,dy:-10},
+  {team:"Essendon",home_avg:50478,away_avg:49402,venue:"M.C.G.",dx:5,dy:-10},
+  {team:"Richmond",home_avg:44403,away_avg:42914,venue:"M.C.G.",dx:5,dy:12},
+  {team:"Melbourne",home_avg:34929,away_avg:45611,venue:"M.C.G.",dx:5,dy:-10},
+  {team:"Hawthorn",home_avg:36037,away_avg:45176,venue:"M.C.G.",dx:-60,dy:12},
+  {team:"W. Bulldogs",home_avg:30055,away_avg:33415,venue:"Docklands",dx:5,dy:-10},
+  {team:"North Melbourne",home_avg:21954,away_avg:26395,venue:"Docklands",dx:5,dy:12}
+];
 vegaEmbed('#chart-scatter-homeaway', cfg({
-  width:"container", height:240,
-  data:{values:teamCrowds},
+  width:"container", height:260,
+  data:{values:teamOffsets},
   layer:[
     {
       mark:{type:"rule",strokeDash:[4,3],strokeWidth:1,color:C.border},
-      data:{values:[{x:20000,y:20000},{x:70000,y:70000}]},
+      data:{values:[{x:18000,y:18000},{x:70000,y:70000}]},
       encoding:{x:{field:"x",type:"quantitative"},y:{field:"y",type:"quantitative"}}
     },
     {
-      mark:{type:"point",filled:true,size:160,opacity:0.85},
+      mark:{type:"point",filled:true,size:200,opacity:0.85},
       encoding:{
-        x:{field:"home_avg",type:"quantitative",title:"Avg home crowd",axis:{format:","},scale:{domain:[15000,70000]}},
-        y:{field:"away_avg",type:"quantitative",title:"Avg away crowd",axis:{format:","},scale:{domain:[20000,60000]}},
+        x:{field:"home_avg",type:"quantitative",title:"Avg home crowd",axis:{format:","},scale:{domain:[15000,72000]}},
+        y:{field:"away_avg",type:"quantitative",title:"Avg away crowd",axis:{format:","},scale:{domain:[18000,58000]}},
         color:{field:"venue",type:"nominal",
-               scale:{domain:["M.C.G.","Docklands"],range:[C.mcg,C.marvel]},legend:null},
+               scale:{domain:["M.C.G.","Docklands"],range:[C.mcg,C.marvel]},
+               legend:{title:"Home venue",orient:"top-left",labelFontSize:11}},
         tooltip:[{field:"team"},{field:"home_avg",title:"Home avg",format:","},{field:"away_avg",title:"Away avg",format:","}]
       }
     },
     {
-      mark:{type:"text",dy:-12,fontSize:11,fontWeight:600},
+      mark:{type:"text",fontSize:11,fontWeight:600,align:"left"},
       encoding:{
         x:{field:"home_avg",type:"quantitative"},
         y:{field:"away_avg",type:"quantitative"},
+        dx:{field:"dx",type:"quantitative"},
+        dy:{field:"dy",type:"quantitative"},
         text:{field:"team"},
         color:{field:"venue",type:"nominal",scale:{domain:["M.C.G.","Docklands"],range:[C.mcg,C.marvel]},legend:null}
       }
@@ -909,25 +925,33 @@ vegaEmbed('#chart-scatter-crowd', cfg({
   params:[{name:"brush",select:{type:"interval"}}],
   layer:[
     {
-      mark:{type:"point",filled:true,size:80,opacity:0.78},
+      mark:{type:"point",filled:true,size:90,opacity:0.8},
       encoding:{
-        x:{field:"crowd",type:"quantitative",title:"MCG attendance",axis:{format:","},scale:{domain:[60000,105000]}},
+        x:{field:"crowd",type:"quantitative",title:"MCG attendance",axis:{format:","},scale:{domain:[58000,105000]}},
         y:{field:"est_boardings",type:"quantitative",title:"Est. Jolimont + Richmond boardings",axis:{format:","}},
-        color:{
-          condition:{param:"brush",field:"finals",type:"nominal",
-                     scale:{domain:[false,true],range:[C.mcg,C.amber]},
-                     legend:{title:"Type",labelExpr:"datum.value?'Finals':'Regular'",labelFontSize:11}},
-          value:"#3a3f5c"
-        },
-        tooltip:[{field:"home"},{field:"away"},{field:"crowd",title:"Crowd",format:","},{field:"est_boardings",title:"Est. boardings",format:","}]
+        color:{field:"finals",type:"nominal",
+               scale:{domain:[false,true],range:[C.mcg,C.amber]},
+               legend:{title:"Match type",labelExpr:"datum.value?'Finals':'Regular season'",labelFontSize:11}},
+        opacity:{condition:{param:"brush",value:1},value:0.2},
+        size:{condition:{param:"brush",value:120},value:50},
+        tooltip:[{field:"home",title:"Home"},{field:"away",title:"Away"},{field:"date",title:"Date"},{field:"crowd",title:"Crowd",format:","},{field:"est_boardings",title:"Est. boardings",format:","}]
       }
     },
     {
-      mark:{type:"line",color:C.green,strokeWidth:1.5,strokeDash:[5,3]},
+      mark:{type:"line",color:C.green,strokeWidth:2,strokeDash:[5,3]},
       transform:[{regression:"est_boardings",on:"crowd"}],
       encoding:{
         x:{field:"crowd",type:"quantitative"},
         y:{field:"est_boardings",type:"quantitative"}
+      }
+    },
+    {
+      mark:{type:"text",align:"left",dx:6,dy:-6,fontSize:10,color:C.amber},
+      transform:[{filter:"datum.crowd > 98000"}],
+      encoding:{
+        x:{field:"crowd",type:"quantitative"},
+        y:{field:"est_boardings",type:"quantitative"},
+        text:{field:"crowd",format:","}
       }
     }
   ]
@@ -935,7 +959,7 @@ vegaEmbed('#chart-scatter-crowd', cfg({
 
 // ─────────────────────── CHART: PATRONAGE TREND (legend clickable) ───────────────────────
 vegaEmbed('#chart-patronage-trend', cfg({
-  width:"container", height:230,
+  width:"container", height:250,
   data:{values:patronageTrend},
   params:[{name:"stationSel",select:{type:"point",fields:["station"]},bind:"legend"}],
   layer:[
@@ -947,8 +971,8 @@ vegaEmbed('#chart-patronage-trend', cfg({
         color:{field:"station",type:"nominal",
                scale:{domain:["Flinders Street","Richmond","North Melbourne","Jolimont"],
                       range:[C.multi,C.mcg,C.marvel,C.amber]},
-               legend:{title:"Station (click to isolate)",orient:"top",labelFontSize:11}},
-        opacity:{condition:{param:"stationSel",value:0.15},value:0.05}
+               legend:{title:"Station — click to isolate",orient:"top",labelFontSize:11}},
+        opacity:{condition:{param:"stationSel",value:0.25},value:0.03}
       }
     },
     {
@@ -959,18 +983,18 @@ vegaEmbed('#chart-patronage-trend', cfg({
         color:{field:"station",type:"nominal",
                scale:{domain:["Flinders Street","Richmond","North Melbourne","Jolimont"],
                       range:[C.multi,C.mcg,C.marvel,C.amber]},legend:null},
-        opacity:{condition:{param:"stationSel",value:1},value:0.18}
+        opacity:{condition:{param:"stationSel",value:1},value:0.15}
       }
     },
     {
-      mark:{type:"point",filled:true,size:55},
+      mark:{type:"point",filled:true,size:60},
       encoding:{
         x:{field:"year",type:"ordinal"},
         y:{field:"p",type:"quantitative"},
         color:{field:"station",type:"nominal",
                scale:{domain:["Flinders Street","Richmond","North Melbourne","Jolimont"],
                       range:[C.multi,C.mcg,C.marvel,C.amber]},legend:null},
-        opacity:{condition:{param:"stationSel",value:1},value:0.18},
+        opacity:{condition:{param:"stationSel",value:1},value:0.15},
         tooltip:[{field:"station"},{field:"year"},{field:"p",title:"Patronage (M)",format:".2f"}]
       }
     },
@@ -980,9 +1004,9 @@ vegaEmbed('#chart-patronage-trend', cfg({
       encoding:{x:{field:"year",type:"ordinal"}}
     },
     {
-      mark:{type:"text",align:"left",dx:4,dy:-8,fontSize:10,color:C.red},
-      data:{values:[{year:2020,p:12}]},
-      encoding:{x:{field:"year",type:"ordinal"},y:{field:"p",type:"quantitative"},text:{value:"COVID-19"}}
+      mark:{type:"text",align:"left",dx:4,dy:-10,fontSize:10,color:C.red,fontWeight:600},
+      data:{values:[{year:2020,p:22}]},
+      encoding:{x:{field:"year",type:"ordinal"},y:{field:"p",type:"quantitative"},text:{value:"⬆ COVID-19"}}
     }
   ]
 }), {actions:false});
