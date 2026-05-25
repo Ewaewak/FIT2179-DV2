@@ -1,0 +1,44 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Scatter plot showing relationship between MCG attendance and estimated station boardings. Includes brush selection and regression line.",
+  "width": "container",
+  "height": 280,
+  "data": {
+    "url": "../data_afl_crowds_2024.json",
+    "format": {"type": "json"}
+  },
+  "transform": [
+    {
+      "calculate": "datum.crowd * 0.32 + 3000",
+      "as": "est_boardings"
+    },
+    {"filter": "datum.venue == 'M.C.G.'"}
+  ],
+  "params": [{"name": "brush", "select": {"type": "interval"}}],
+  "layer": [
+    {
+      "mark": {"type": "point", "filled": true, "size": 70, "opacity": 0.75},
+      "encoding": {
+        "x": {"field": "crowd", "type": "quantitative", "title": "MCG attendance", "axis": {"format": ","}},
+        "y": {"field": "est_boardings", "type": "quantitative", "title": "Est. station boardings", "axis": {"format": ","}},
+        "color": {
+          "condition": {
+            "param": "brush",
+            "field": "finals",
+            "type": "nominal",
+            "scale": {"domain": [false, true], "range": ["#4caf50", "#f39c12"]}
+          },
+          "value": "#444"
+        }
+      }
+    },
+    {
+      "mark": {"type": "line", "color": "#2ecc71", "strokeWidth": 1.5, "strokeDash": [4, 3]},
+      "transform": [{"regression": "est_boardings", "on": "crowd"}],
+      "encoding": {
+        "x": {"field": "crowd", "type": "quantitative"},
+        "y": {"field": "est_boardings", "type": "quantitative"}
+      }
+    }
+  ]
+}

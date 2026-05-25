@@ -1,0 +1,63 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Annual patronage trend 2017-2024 at key precinct stations showing the COVID-19 impact and recovery. Source: Transport Victoria Annual Station Patronage.",
+  "width": "container",
+  "height": 280,
+  "data": {
+    "url": "../data_station_patronage.json",
+    "format": {"type": "json"}
+  },
+  "params": [
+    {
+      "name": "stationSel",
+      "select": {"type": "point", "fields": ["station"]},
+      "bind": "legend"
+    }
+  ],
+  "layer": [
+    {
+      "mark": {"type": "line", "strokeWidth": 2.5},
+      "encoding": {
+        "x": {"field": "year", "type": "ordinal", "title": "Year"},
+        "y": {
+          "field": "patronage",
+          "type": "quantitative",
+          "title": "Patronage (millions)",
+          "axis": {"format": ".1f"}
+        },
+        "color": {
+          "field": "station",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Flinders Street", "Richmond", "North Melbourne", "Jolimont"],
+            "range": ["#9b59b6", "#4caf50", "#1565c0", "#f39c12"]
+          },
+          "legend": {"title": "Station", "orient": "top"}
+        },
+        "opacity": {
+          "condition": {"param": "stationSel", "value": 1},
+          "value": 0.15
+        }
+      }
+    },
+    {
+      "mark": {"type": "point", "filled": true, "size": 60},
+      "encoding": {
+        "x": {"field": "year", "type": "ordinal"},
+        "y": {"field": "patronage", "type": "quantitative"},
+        "color": {
+          "field": "station",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Flinders Street", "Richmond", "North Melbourne", "Jolimont"],
+            "range": ["#9b59b6", "#4caf50", "#1565c0", "#f39c12"]
+          }
+        },
+        "opacity": {
+          "condition": {"param": "stationSel", "value": 1},
+          "value": 0.15
+        }
+      }
+    }
+  ]
+}

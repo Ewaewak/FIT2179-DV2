@@ -1,0 +1,41 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Dot matrix showing which train lines serve which precinct stations, coloured by the venue each combination serves.",
+  "width": "container",
+  "height": 200,
+  "data": {
+    "values": [
+      {"station": "Jolimont", "line": "Hurstbridge", "serves": "MCG"},
+      {"station": "Jolimont", "line": "Mernda", "serves": "MCG"},
+      {"station": "Richmond", "line": "Glen Waverley", "serves": "MCG"},
+      {"station": "Richmond", "line": "Belgrave", "serves": "MCG"},
+      {"station": "Richmond", "line": "Lilydale", "serves": "MCG"},
+      {"station": "Richmond", "line": "Alamein", "serves": "MCG"},
+      {"station": "North Melbourne", "line": "Upfield", "serves": "Marvel"},
+      {"station": "North Melbourne", "line": "Craigieburn", "serves": "Marvel"},
+      {"station": "North Melbourne", "line": "Sunbury", "serves": "Marvel"},
+      {"station": "Flinders Street", "line": "All lines (interchange)", "serves": "All"},
+      {"station": "Spencer Street", "line": "Werribee", "serves": "Marvel"},
+      {"station": "Spencer Street", "line": "Williamstown", "serves": "Marvel"},
+      {"station": "Spencer Street", "line": "Frankston", "serves": "Marvel"},
+      {"station": "Spencer Street", "line": "Sunbury", "serves": "Marvel"}
+    ]
+  },
+  "mark": {"type": "circle", "size": 180, "opacity": 0.85},
+  "encoding": {
+    "y": {"field": "station", "type": "nominal", "title": "Station"},
+    "x": {
+      "field": "line",
+      "type": "nominal",
+      "title": "Train Line",
+      "axis": {"labelAngle": -35}
+    },
+    "color": {
+      "field": "serves",
+      "type": "nominal",
+      "scale": {"domain": ["MCG", "Marvel", "All"], "range": ["#4caf50", "#1565c0", "#9b59b6"]},
+      "legend": {"title": "Venue served", "orient": "top"}
+    },
+    "tooltip": [{"field": "station"}, {"field": "line", "title": "Line"}, {"field": "serves", "title": "Venue"}]
+  }
+}

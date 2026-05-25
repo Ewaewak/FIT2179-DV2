@@ -1,0 +1,74 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Proportional symbol map of Melbourne showing key train stations sized by match-day boarding estimates. Base map from FIT3179 TopoJSON (ABS locality boundaries via data.gov.au).",
+  "width": 700,
+  "height": 420,
+  "projection": {"type": "mercator"},
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/7_others/data/vic_suburb.topojson",
+        "format": {"type": "topojson", "feature": "vic_suburb"}
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#1a1d2b",
+        "stroke": "#2a2e45",
+        "strokeWidth": 0.5
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {"station": "Flinders Street", "lat": -37.8182, "lng": 144.9671, "boardings": 55000, "venue": "All venues"},
+          {"station": "Richmond", "lat": -37.8234, "lng": 144.9999, "boardings": 21000, "venue": "MCG / AAMI Park"},
+          {"station": "Jolimont", "lat": -37.8189, "lng": 144.9830, "boardings": 28500, "venue": "MCG"},
+          {"station": "North Melbourne", "lat": -37.8072, "lng": 144.9392, "boardings": 18500, "venue": "Marvel Stadium"},
+          {"station": "Spencer Street", "lat": -37.8183, "lng": 144.9524, "boardings": 14200, "venue": "Marvel Stadium"}
+        ]
+      },
+      "mark": {"type": "circle", "opacity": 0.8, "stroke": "#fff", "strokeWidth": 1},
+      "encoding": {
+        "longitude": {"field": "lng", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "size": {
+          "field": "boardings",
+          "type": "quantitative",
+          "scale": {"range": [400, 4000]},
+          "legend": {"title": "Match-day boardings", "orient": "bottom-right"}
+        },
+        "color": {
+          "field": "venue",
+          "type": "nominal",
+          "scale": {
+            "domain": ["MCG", "MCG / AAMI Park", "Marvel Stadium", "All venues"],
+            "range": ["#4caf50", "#4caf50", "#1565c0", "#9b59b6"]
+          },
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "station", "title": "Station"},
+          {"field": "boardings", "title": "Match-day boardings", "format": ","},
+          {"field": "venue", "title": "Primary venue served"}
+        ]
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {"station": "Flinders Street", "lat": -37.8182, "lng": 144.9671},
+          {"station": "Richmond", "lat": -37.8234, "lng": 144.9999},
+          {"station": "Jolimont", "lat": -37.8189, "lng": 144.9830},
+          {"station": "North Melbourne", "lat": -37.8072, "lng": 144.9392},
+          {"station": "Spencer Street", "lat": -37.8183, "lng": 144.9524}
+        ]
+      },
+      "mark": {"type": "text", "dy": -16, "fontSize": 11, "fontWeight": 600, "color": "#e8eaf0"},
+      "encoding": {
+        "longitude": {"field": "lng", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "text": {"field": "station"}
+      }
+    }
+  ]
+}
