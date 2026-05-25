@@ -580,61 +580,248 @@ const melbGeoJSON = {
 };
 
 // ─────────────────────── CHART: MAP ───────────────────────
-vegaEmbed('#chart-map', cfg({
-  width:"container", height:440,
-  projection:{type:"mercator", center:[144.972, -37.820], scale:95000},
-  layer:[
-    {
-      data:{values:melbGeoJSON.features},
-      mark:{type:"geoshape", fill:"#1a1d2b", stroke:"#3a3f5c", strokeWidth:1}
-    },
-    {
-      data:{values:venueMapData},
-      mark:{type:"point", shape:"square", filled:true, opacity:0.9, size:180},
-      encoding:{
-        longitude:{field:"lng",type:"quantitative"},
-        latitude:{field:"lat",type:"quantitative"},
-        color:{value:C.amber},
-        tooltip:[{field:"name",title:"Venue"},{field:"capacity",title:"Capacity",format:","},{field:"sport",title:"Sport"}]
-      }
-    },
-    {
-      data:{values:venueMapData},
-      mark:{type:"text", dy:-14, fontSize:10, fontWeight:700, color:C.amber},
-      encoding:{
-        longitude:{field:"lng",type:"quantitative"},
-        latitude:{field:"lat",type:"quantitative"},
-        text:{field:"name"}
-      }
-    },
-    {
-      data:{values:stationMapData},
-      mark:{type:"circle", opacity:0.85, stroke:"#fff", strokeWidth:1.5},
-      encoding:{
-        longitude:{field:"lng",type:"quantitative"},
-        latitude:{field:"lat",type:"quantitative"},
-        size:{field:"boardings",type:"quantitative",
-              scale:{domain:[10000,60000],range:[300,3200]},
-              legend:{title:"Match-day boardings",orient:"bottom-left",labelFontSize:10,
-                      values:[14000,21000,28500,55000]}},
-        color:{field:"venue",type:"nominal",
-               scale:{domain:["All venues","MCG / AAMI Park","Marvel Stadium"],
-                      range:[C.multi, C.mcg, C.marvel]},
-               legend:{title:"Station catchment",orient:"top-left",labelFontSize:11}},
-        tooltip:[{field:"station",title:"Station"},{field:"boardings",title:"Match-day boardings",format:","},{field:"venue",title:"Primary venue"},{field:"lines",title:"Train lines"}]
-      }
-    },
-    {
-      data:{values:stationMapData},
-      mark:{type:"text", dy:-14, dx:4, fontSize:10.5, fontWeight:600, color:"#e8eaf0"},
-      encoding:{
-        longitude:{field:"lng",type:"quantitative"},
-        latitude:{field:"lat",type:"quantitative"},
-        text:{field:"station"}
-      }
-    }
-  ]
-}), {actions:false});
+// ─────────────────────── CHART: MAP (using SVG background + point positions) ───────────────────────
+// The map uses a custom Vega spec (not Vega-Lite) embedded via vegaEmbed
+// to render a proper Melbourne street-grid background with correct station positions
+
+// First, compute pixel positions from lat/lng using simple Mercator math
+// Bounding box: lng 144.930–145.020, lat -37.795–-37.845
+const MAP_W = 820, MAP_H = 440;
+const LNG_MIN = 144.930, LNG_MAX = 145.025;
+const LAT_MIN = -37.848, LAT_MAX = -37.790;
+
+function lngToX(lng) { return ((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * MAP_W; }
+function latToY(lat) { return ((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * MAP_H; }
+// Invert Y because lat increases upward but SVG increases downward
+function latToYi(lat) { return MAP_H - latToY(lat); }
+
+const stationsPlotted = stationMapData.map(d => ({
+  ...d,
+  px: lngToX(d.lng),
+  py: latToYi(d.lat)
+}));
+const venuesPlotted = venueMapData.map(d => ({
+  ...d,
+  px: lngToX(d.lng),
+  py: latToYi(d.lat)
+}));
+
+// Max boarding for size scaling
+const maxBoard = Math.max(...stationsPlotted.map(d => d.boardings));
+
+// Label offsets per station to avoid overlap
+const labelOffsets = {
+  "Flinders Street": {dx: 0, dy: -18, anchor: "middle"},
+  "Richmond":        {dx: 14, dy: -10, anchor: "start"},
+  "Jolimont":        {dx: 14, dy: 6,  anchor: "start"},
+  "North Melbourne": {dx: 0, dy: -18, anchor: "middle"},
+  "Spencer Street":  {dx: 0, dy: 18,  anchor: "middle"}
+};
+
+function drawMap() {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", `0 0 ${MAP_W} ${MAP_H}`);
+  svg.setAttribute("width", "100%");
+  svg.style.display = "block";
+  svg.style.background = "#13141f";
+  svg.style.borderRadius = "3px";
+
+  // ── Background suburb fills ──
+  const suburbFill = "#1a1d2b";
+  const suburbStroke = "#2a2f4a";
+
+  // Suburb polygons in pixel space
+  const suburbPolys = melbGeoJSON.features.map(f => {
+    const coords = f.geometry.coordinates[0];
+    const pts = coords.map(([lng,lat]) => `${lngToX(lng)},${latToYi(lat)}`).join(" ");
+    return {name: f.properties.suburb, pts};
+  });
+
+  suburbPolys.forEach(s => {
+    const poly = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    poly.setAttribute("points", s.pts);
+    poly.setAttribute("fill", suburbFill);
+    poly.setAttribute("stroke", suburbStroke);
+    poly.setAttribute("stroke-width", "1");
+    svg.appendChild(poly);
+  });
+
+  // ── Road grid lines (approximate Melbourne CBD/inner city grid) ──
+  const roads = [
+    // Horizontal roads (Yarra ~-37.822)
+    {x1:0,y1:latToYi(-37.822),x2:MAP_W,y2:latToYi(-37.822),w:2,c:"#252840"},
+    {x1:0,y1:latToYi(-37.815),x2:MAP_W,y2:latToYi(-37.815),w:1.5,c:"#252840"},
+    {x1:0,y1:latToYi(-37.830),x2:MAP_W,y2:latToYi(-37.830),w:1.5,c:"#252840"},
+    {x1:0,y1:latToYi(-37.808),x2:MAP_W,y2:latToYi(-37.808),w:1,c:"#1e2138"},
+    {x1:0,y1:latToYi(-37.838),x2:MAP_W,y2:latToYi(-37.838),w:1,c:"#1e2138"},
+    // Vertical roads
+    {x1:lngToX(144.968),y1:0,x2:lngToX(144.968),y2:MAP_H,w:2,c:"#252840"},
+    {x1:lngToX(144.952),y1:0,x2:lngToX(144.952),y2:MAP_H,w:1.5,c:"#252840"},
+    {x1:lngToX(144.985),y1:0,x2:lngToX(144.985),y2:MAP_H,w:1.5,c:"#252840"},
+    {x1:lngToX(145.003),y1:0,x2:lngToX(145.003),y2:MAP_H,w:1,c:"#1e2138"},
+    {x1:lngToX(144.940),y1:0,x2:lngToX(144.940),y2:MAP_H,w:1,c:"#1e2138"},
+    {x1:lngToX(144.975),y1:0,x2:lngToX(144.975),y2:MAP_H,w:1,c:"#1e2138"},
+  ];
+  roads.forEach(r => {
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",r.x1); line.setAttribute("y1",r.y1);
+    line.setAttribute("x2",r.x2); line.setAttribute("y2",r.y2);
+    line.setAttribute("stroke",r.c); line.setAttribute("stroke-width",r.w);
+    svg.appendChild(line);
+  });
+
+  // ── Yarra River (approximate arc) ──
+  const riverPath = document.createElementNS("http://www.w3.org/2000/svg","path");
+  const ry = latToYi(-37.8225);
+  const d = `M 0 ${ry+10} Q ${MAP_W*0.3} ${ry-8} ${MAP_W*0.5} ${ry+5} Q ${MAP_W*0.7} ${ry+18} ${MAP_W} ${ry+8}`;
+  riverPath.setAttribute("d", d);
+  riverPath.setAttribute("stroke", "#1a3a5c"); riverPath.setAttribute("stroke-width","8");
+  riverPath.setAttribute("fill","none"); riverPath.setAttribute("opacity","0.7");
+  svg.appendChild(riverPath);
+
+  // River label
+  const riverLbl = document.createElementNS("http://www.w3.org/2000/svg","text");
+  riverLbl.setAttribute("x", lngToX(144.97)); riverLbl.setAttribute("y", latToYi(-37.8225)+22);
+  riverLbl.setAttribute("fill","#2a5580"); riverLbl.setAttribute("font-size","10");
+  riverLbl.setAttribute("font-family","DM Sans"); riverLbl.setAttribute("text-anchor","middle");
+  riverLbl.textContent = "Yarra River";
+  svg.appendChild(riverLbl);
+
+  // ── Suburb labels ──
+  const suburbLabels = [
+    {name:"CBD",lng:144.962,lat:-37.814},
+    {name:"Docklands",lng:144.948,lat:-37.820},
+    {name:"Richmond",lng:145.007,lat:-37.826},
+    {name:"East Melbourne",lng:144.983,lat:-37.816},
+    {name:"Southbank",lng:144.966,lat:-37.826},
+  ];
+  suburbLabels.forEach(sl => {
+    const t = document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x", lngToX(sl.lng)); t.setAttribute("y", latToYi(sl.lat));
+    t.setAttribute("fill","#3a4060"); t.setAttribute("font-size","9");
+    t.setAttribute("font-family","DM Sans"); t.setAttribute("text-anchor","middle");
+    t.setAttribute("font-weight","600"); t.setAttribute("letter-spacing","1");
+    t.textContent = sl.name.toUpperCase();
+    svg.appendChild(t);
+  });
+
+  // ── Venue markers (squares) ──
+  const vColors = {MCG: "#4caf50", "Marvel Stadium": "#1976d2", "AAMI Park": "#f57c00"};
+  venuesPlotted.forEach(v => {
+    const col = vColors[v.name] || "#f39c12";
+    const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    const sz = 12;
+    rect.setAttribute("x", v.px - sz/2); rect.setAttribute("y", v.py - sz/2);
+    rect.setAttribute("width", sz); rect.setAttribute("height", sz);
+    rect.setAttribute("fill", col); rect.setAttribute("opacity","0.9");
+    rect.setAttribute("rx","2");
+    // Tooltip via title
+    const title = document.createElementNS("http://www.w3.org/2000/svg","title");
+    title.textContent = `${v.name} — Capacity: ${v.capacity.toLocaleString()}`;
+    rect.appendChild(title);
+    svg.appendChild(rect);
+
+    const vt = document.createElementNS("http://www.w3.org/2000/svg","text");
+    vt.setAttribute("x", v.px); vt.setAttribute("y", v.py - 10);
+    vt.setAttribute("fill", col); vt.setAttribute("font-size","9.5");
+    vt.setAttribute("font-family","Barlow Condensed"); vt.setAttribute("font-weight","700");
+    vt.setAttribute("text-anchor","middle");
+    vt.textContent = v.name;
+    svg.appendChild(vt);
+  });
+
+  // ── Station bubbles ──
+  const sColors = {
+    "All venues": "#9b59b6",
+    "MCG / AAMI Park": "#4caf50",
+    "Marvel Stadium": "#1976d2"
+  };
+  stationsPlotted.forEach(s => {
+    const col = sColors[s.venue] || "#2ecc71";
+    const r = 12 + (s.boardings / maxBoard) * 32; // radius 12–44px
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    circle.setAttribute("cx", s.px); circle.setAttribute("cy", s.py);
+    circle.setAttribute("r", r);
+    circle.setAttribute("fill", col); circle.setAttribute("opacity","0.78");
+    circle.setAttribute("stroke","#fff"); circle.setAttribute("stroke-width","1.5");
+    const title = document.createElementNS("http://www.w3.org/2000/svg","title");
+    title.textContent = `${s.station}\nMatch-day boardings: ${s.boardings.toLocaleString()}\nVenue: ${s.venue}\nLines: ${s.lines}`;
+    circle.appendChild(title);
+    svg.appendChild(circle);
+
+    // Station label
+    const off = labelOffsets[s.station] || {dx:0,dy:-18,anchor:"middle"};
+    const t = document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x", s.px + off.dx); t.setAttribute("y", s.py + off.dy);
+    t.setAttribute("fill","#e8eaf0"); t.setAttribute("font-size","11");
+    t.setAttribute("font-family","Barlow Condensed"); t.setAttribute("font-weight","700");
+    t.setAttribute("text-anchor", off.anchor);
+    t.setAttribute("pointer-events","none");
+    t.textContent = s.station;
+    svg.appendChild(t);
+  });
+
+  // ── Legend ──
+  const legendX = 18, legendY = MAP_H - 115;
+  const lgBg = document.createElementNS("http://www.w3.org/2000/svg","rect");
+  lgBg.setAttribute("x",legendX-6); lgBg.setAttribute("y",legendY-16);
+  lgBg.setAttribute("width",170); lgBg.setAttribute("height",110);
+  lgBg.setAttribute("fill","#0d0d0f"); lgBg.setAttribute("opacity","0.75"); lgBg.setAttribute("rx","3");
+  svg.appendChild(lgBg);
+
+  const lgTitle = document.createElementNS("http://www.w3.org/2000/svg","text");
+  lgTitle.setAttribute("x",legendX); lgTitle.setAttribute("y",legendY);
+  lgTitle.setAttribute("fill","#7a80a0"); lgTitle.setAttribute("font-size","9");
+  lgTitle.setAttribute("font-family","Barlow Condensed"); lgTitle.setAttribute("font-weight","700");
+  lgTitle.setAttribute("letter-spacing","2"); lgTitle.textContent = "STATION CATCHMENT";
+  svg.appendChild(lgTitle);
+
+  [["MCG / AAMI Park","#4caf50"],["Marvel Stadium","#1976d2"],["All venues (interchange)","#9b59b6"]].forEach(([lbl,col],i) => {
+    const cy = legendY + 18 + i*22;
+    const lc = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    lc.setAttribute("cx",legendX+7); lc.setAttribute("cy",cy);
+    lc.setAttribute("r",7); lc.setAttribute("fill",col); lc.setAttribute("opacity","0.85");
+    svg.appendChild(lc);
+    const lt = document.createElementNS("http://www.w3.org/2000/svg","text");
+    lt.setAttribute("x",legendX+18); lt.setAttribute("y",cy+4);
+    lt.setAttribute("fill","#a0a4c0"); lt.setAttribute("font-size","10");
+    lt.setAttribute("font-family","DM Sans"); lt.textContent = lbl;
+    svg.appendChild(lt);
+  });
+
+  // Size legend
+  const szX = MAP_W - 130, szY = MAP_H - 80;
+  const szBg = document.createElementNS("http://www.w3.org/2000/svg","rect");
+  szBg.setAttribute("x",szX-10); szBg.setAttribute("y",szY-20);
+  szBg.setAttribute("width",125); szBg.setAttribute("height",75);
+  szBg.setAttribute("fill","#0d0d0f"); szBg.setAttribute("opacity","0.75"); szBg.setAttribute("rx","3");
+  svg.appendChild(szBg);
+  const szTitle = document.createElementNS("http://www.w3.org/2000/svg","text");
+  szTitle.setAttribute("x",szX); szTitle.setAttribute("y",szY-4);
+  szTitle.setAttribute("fill","#7a80a0"); szTitle.setAttribute("font-size","9");
+  szTitle.setAttribute("font-family","Barlow Condensed"); szTitle.setAttribute("font-weight","700");
+  szTitle.setAttribute("letter-spacing","2"); szTitle.textContent = "MATCH-DAY BOARDINGS";
+  svg.appendChild(szTitle);
+  [[14200,"14K"],[28500,"28K"],[55000,"55K"]].forEach(([b,lbl],i) => {
+    const r = 12 + (b / maxBoard) * 32;
+    const cx = szX + 10 + r + i*38;
+    const lc = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    lc.setAttribute("cx",cx); lc.setAttribute("cy",szY+24);
+    lc.setAttribute("r",r); lc.setAttribute("fill","none"); lc.setAttribute("stroke","#4a5070"); lc.setAttribute("stroke-width","1.5");
+    svg.appendChild(lc);
+    const lt = document.createElementNS("http://www.w3.org/2000/svg","text");
+    lt.setAttribute("x",cx); lt.setAttribute("y",szY+50);
+    lt.setAttribute("fill","#7a80a0"); lt.setAttribute("font-size","9");
+    lt.setAttribute("font-family","DM Sans"); lt.setAttribute("text-anchor","middle");
+    lt.textContent = lbl;
+    svg.appendChild(lt);
+  });
+
+  document.getElementById('chart-map').innerHTML = '';
+  document.getElementById('chart-map').appendChild(svg);
+}
+drawMap();
 
 // ─────────────────────── CHART: CAPACITIES ───────────────────────
 vegaEmbed('#chart-capacities', cfg({
@@ -667,13 +854,13 @@ vegaEmbed('#chart-patronage2024', cfg({
 
 // ─────────────────────── CHART: SMALL MULTIPLES ───────────────────────
 vegaEmbed('#chart-small-multiples', cfg({
-  width:"container", height:140,
+  width:240, height:130,
   data:{values:patronageTrend},
-  facet:{field:"station",type:"nominal",columns:2,
-         header:{labelFont:"Barlow Condensed",labelFontSize:13,labelFontWeight:700,labelColor:C.text,labelPadding:8}},
+  facet:{field:"station",type:"nominal",columns:4,
+         header:{labelFont:"Barlow Condensed",labelFontSize:12,labelFontWeight:700,labelColor:C.text,labelPadding:6}},
   resolve:{scale:{y:"independent"}},
   spec:{
-    width:"container",
+    width:240, height:130,
     layer:[
       {
         mark:{type:"area",opacity:0.15},
@@ -795,31 +982,31 @@ vegaEmbed('#chart-team-crowds', cfg({
 }), {actions:false});
 
 // ─────────────────────── CHART: HOME VS AWAY SCATTER ───────────────────────
-// Add per-team label offsets to prevent overlap
-const teamOffsets = [
-  {team:"Collingwood",home_avg:64905,away_avg:53467,venue:"M.C.G.",dx:5,dy:-10},
-  {team:"Carlton",home_avg:58311,away_avg:52975,venue:"M.C.G.",dx:-60,dy:-10},
-  {team:"Essendon",home_avg:50478,away_avg:49402,venue:"M.C.G.",dx:5,dy:-10},
-  {team:"Richmond",home_avg:44403,away_avg:42914,venue:"M.C.G.",dx:5,dy:12},
-  {team:"Melbourne",home_avg:34929,away_avg:45611,venue:"M.C.G.",dx:5,dy:-10},
-  {team:"Hawthorn",home_avg:36037,away_avg:45176,venue:"M.C.G.",dx:-60,dy:12},
-  {team:"W. Bulldogs",home_avg:30055,away_avg:33415,venue:"Docklands",dx:5,dy:-10},
-  {team:"North Melbourne",home_avg:21954,away_avg:26395,venue:"Docklands",dx:5,dy:12}
+// Per-team label positions with enough separation to avoid all overlap
+const teamLabelData = [
+  {team:"Collingwood",home_avg:64905,away_avg:53467,venue:"M.C.G.",lx:63000,ly:55500},
+  {team:"Carlton",    home_avg:58311,away_avg:52975,venue:"M.C.G.",lx:55000,ly:51000},
+  {team:"Essendon",   home_avg:50478,away_avg:49402,venue:"M.C.G.",lx:52000,ly:47500},
+  {team:"Richmond",   home_avg:44403,away_avg:42914,venue:"M.C.G.",lx:46000,ly:40800},
+  {team:"Melbourne",  home_avg:34929,away_avg:45611,venue:"M.C.G.",lx:29500,ly:47200},
+  {team:"Hawthorn",   home_avg:36037,away_avg:45176,venue:"M.C.G.",lx:38500,ly:43200},
+  {team:"W. Bulldogs",home_avg:30055,away_avg:33415,venue:"Docklands",lx:32000,ly:31500},
+  {team:"North Melbourne",home_avg:21954,away_avg:26395,venue:"Docklands",lx:24000,ly:24500}
 ];
 vegaEmbed('#chart-scatter-homeaway', cfg({
-  width:"container", height:260,
-  data:{values:teamOffsets},
+  width:"container", height:280,
   layer:[
     {
-      mark:{type:"rule",strokeDash:[4,3],strokeWidth:1,color:C.border},
-      data:{values:[{x:18000,y:18000},{x:70000,y:70000}]},
+      data:{values:[{x:15000,y:15000},{x:70000,y:70000}]},
+      mark:{type:"line",strokeDash:[4,3],strokeWidth:1,color:C.border},
       encoding:{x:{field:"x",type:"quantitative"},y:{field:"y",type:"quantitative"}}
     },
     {
-      mark:{type:"point",filled:true,size:200,opacity:0.85},
+      data:{values:teamLabelData},
+      mark:{type:"point",filled:true,size:220,opacity:0.9},
       encoding:{
-        x:{field:"home_avg",type:"quantitative",title:"Avg home crowd",axis:{format:","},scale:{domain:[15000,72000]}},
-        y:{field:"away_avg",type:"quantitative",title:"Avg away crowd",axis:{format:","},scale:{domain:[18000,58000]}},
+        x:{field:"home_avg",type:"quantitative",title:"Avg home crowd",axis:{format:","},scale:{domain:[14000,72000]}},
+        y:{field:"away_avg",type:"quantitative",title:"Avg away crowd",axis:{format:","},scale:{domain:[14000,58000]}},
         color:{field:"venue",type:"nominal",
                scale:{domain:["M.C.G.","Docklands"],range:[C.mcg,C.marvel]},
                legend:{title:"Home venue",orient:"top-left",labelFontSize:11}},
@@ -827,14 +1014,14 @@ vegaEmbed('#chart-scatter-homeaway', cfg({
       }
     },
     {
-      mark:{type:"text",fontSize:11,fontWeight:600,align:"left"},
+      data:{values:teamLabelData},
+      mark:{type:"text",fontSize:11,fontWeight:700,align:"left"},
       encoding:{
-        x:{field:"home_avg",type:"quantitative"},
-        y:{field:"away_avg",type:"quantitative"},
-        dx:{field:"dx",type:"quantitative"},
-        dy:{field:"dy",type:"quantitative"},
+        x:{field:"lx",type:"quantitative"},
+        y:{field:"ly",type:"quantitative"},
         text:{field:"team"},
-        color:{field:"venue",type:"nominal",scale:{domain:["M.C.G.","Docklands"],range:[C.mcg,C.marvel]},legend:null}
+        color:{field:"venue",type:"nominal",
+               scale:{domain:["M.C.G.","Docklands"],range:[C.mcg,C.marvel]},legend:null}
       }
     }
   ]
@@ -964,15 +1151,14 @@ vegaEmbed('#chart-patronage-trend', cfg({
   params:[{name:"stationSel",select:{type:"point",fields:["station"]},bind:"legend"}],
   layer:[
     {
-      mark:{type:"area",opacity:0.12},
+      mark:{type:"area",opacity:0.1},
       encoding:{
         x:{field:"year",type:"ordinal",title:"Year"},
         y:{field:"p",type:"quantitative",title:"Patronage (M)",axis:{format:".1f"}},
         color:{field:"station",type:"nominal",
                scale:{domain:["Flinders Street","Richmond","North Melbourne","Jolimont"],
                       range:[C.multi,C.mcg,C.marvel,C.amber]},
-               legend:{title:"Station — click to isolate",orient:"top",labelFontSize:11}},
-        opacity:{condition:{param:"stationSel",value:0.25},value:0.03}
+               legend:{title:"Click a station to isolate",orient:"top",labelFontSize:11}}
       }
     },
     {
@@ -983,7 +1169,7 @@ vegaEmbed('#chart-patronage-trend', cfg({
         color:{field:"station",type:"nominal",
                scale:{domain:["Flinders Street","Richmond","North Melbourne","Jolimont"],
                       range:[C.multi,C.mcg,C.marvel,C.amber]},legend:null},
-        opacity:{condition:{param:"stationSel",value:1},value:0.15}
+        opacity:{condition:{param:"stationSel",empty:true,value:1},value:0.1}
       }
     },
     {
@@ -994,19 +1180,19 @@ vegaEmbed('#chart-patronage-trend', cfg({
         color:{field:"station",type:"nominal",
                scale:{domain:["Flinders Street","Richmond","North Melbourne","Jolimont"],
                       range:[C.multi,C.mcg,C.marvel,C.amber]},legend:null},
-        opacity:{condition:{param:"stationSel",value:1},value:0.15},
+        opacity:{condition:{param:"stationSel",empty:true,value:1},value:0.1},
         tooltip:[{field:"station"},{field:"year"},{field:"p",title:"Patronage (M)",format:".2f"}]
       }
     },
     {
-      mark:{type:"rule",strokeDash:[4,3],strokeWidth:1.2,color:C.red},
+      mark:{type:"rule",strokeDash:[4,3],strokeWidth:1.5,color:C.red},
       data:{values:[{year:2020}]},
       encoding:{x:{field:"year",type:"ordinal"}}
     },
     {
-      mark:{type:"text",align:"left",dx:4,dy:-10,fontSize:10,color:C.red,fontWeight:600},
+      mark:{type:"text",align:"left",dx:4,dy:-12,fontSize:10,color:C.red,fontWeight:600},
       data:{values:[{year:2020,p:22}]},
-      encoding:{x:{field:"year",type:"ordinal"},y:{field:"p",type:"quantitative"},text:{value:"⬆ COVID-19"}}
+      encoding:{x:{field:"year",type:"ordinal"},y:{field:"p",type:"quantitative"},text:{value:"COVID-19 ↓"}}
     }
   ]
 }), {actions:false});
