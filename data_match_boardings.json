@@ -1,0 +1,7 @@
+[
+  {"station":"Jolimont","venue":"MCG","match_day_boardings":28500,"normal_saturday":4200,"sport":"AFL"},
+  {"station":"Richmond","venue":"MCG / AAMI","match_day_boardings":21000,"normal_saturday":12000,"sport":"AFL"},
+  {"station":"North Melbourne","venue":"Marvel Stadium","match_day_boardings":18500,"normal_saturday":6100,"sport":"AFL"},
+  {"station":"Flinders Street","venue":"All venues","match_day_boardings":55000,"normal_saturday":38000,"sport":"AFL"},
+  {"station":"Spencer Street","venue":"Marvel Stadium","match_day_boardings":14200,"normal_saturday":8900,"sport":"AFL"}
+]

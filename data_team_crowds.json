@@ -1,0 +1,10 @@
+[
+  {"team":"Collingwood","home_avg":64905,"away_avg":53467,"venue":"M.C.G.","color":"#000000"},
+  {"team":"Carlton","home_avg":58311,"away_avg":52975,"venue":"M.C.G.","color":"#002B5C"},
+  {"team":"Richmond","home_avg":44403,"away_avg":42914,"venue":"M.C.G.","color":"#FFD200"},
+  {"team":"Essendon","home_avg":50478,"away_avg":49402,"venue":"M.C.G.","color":"#CC2031"},
+  {"team":"Melbourne","home_avg":34929,"away_avg":45611,"venue":"M.C.G.","color":"#CC2031"},
+  {"team":"Hawthorn","home_avg":36037,"away_avg":45176,"venue":"M.C.G.","color":"#4D2004"},
+  {"team":"North Melbourne","home_avg":21954,"away_avg":26395,"venue":"Docklands","color":"#003087"},
+  {"team":"W. Bulldogs","home_avg":30055,"away_avg":33415,"venue":"Docklands","color":"#0039A6"}
+]

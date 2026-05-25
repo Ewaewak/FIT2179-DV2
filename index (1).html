@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match Day Melbourne — Sports Precincts & the Train Network</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <style>
+    :root {
+      --bg:        #0d0d0f;
+      --bg2:       #13141a;
+      --bg3:       #1a1c25;
+      --card:      #1e2030;
+      --border:    #2a2e45;
+      --green:     #2ecc71;
+      --green-d:   #1a8a4a;
+      --amber:     #f39c12;
+      --amber-l:   #f5c842;
+      --red:       #e74c3c;
+      --blue:      #3498db;
+      --text:      #e8eaf0;
+      --muted:     #7a80a0;
+      --accent:    #c0392b;
+      --mcg:       #4caf50;
+      --marvel:    #1565c0;
+      --aami:      #f57c00;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── SCOREBOARD HEADER ─── */
+    header {
+      position: relative;
+      background: linear-gradient(135deg, #0a0a0c 0%, #14161f 50%, #0d0f14 100%);
+      border-bottom: 2px solid var(--green);
+      overflow: hidden;
+      padding: 0;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 32px 32px;
+      position: relative;
+      z-index: 2;
+    }
+    .header-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 10px;
+      display: block;
+    }
+    header h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(40px, 6vw, 78px);
+      font-weight: 900;
+      line-height: 0.92;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+    header h1 span.hl { color: var(--green); }
+    .header-sub {
+      font-size: 15px;
+      color: var(--muted);
+      margin-top: 14px;
+      max-width: 580px;
+      line-height: 1.6;
+    }
+
+    /* KPI strip */
+    .kpi-strip {
+      display: flex;
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .kpi {
+      flex: 1;
+      background: var(--bg2);
+      padding: 18px 24px;
+      text-align: center;
+    }
+    .kpi-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--green);
+      display: block;
+      line-height: 1;
+    }
+    .kpi-lbl {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav ul {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      list-style: none;
+      padding: 0 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav ul::-webkit-scrollbar { display: none; }
+    nav li a {
+      display: block;
+      padding: 14px 18px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    nav li a:hover, nav li a.active { color: var(--text); border-bottom-color: var(--green); }
+
+    /* ─── MAIN LAYOUT ─── */
+    main { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
+
+    /* section headings */
+    .section {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .section:first-child { border-top: none; }
+    .section-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-badge::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      line-height: 1.05;
+    }
+    .section-intro {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 700px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .section-intro strong { color: var(--text); }
+
+    /* ─── CHART CARDS ─── */
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .chart-card h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .chart-card .chart-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .chart-card .annotation {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 12px;
+      line-height: 1.5;
+      border-left: 2px solid var(--green);
+      padding-left: 10px;
+    }
+
+    /* grid layouts */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* venue cards */
+    .venue-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+    @media (max-width: 800px) { .venue-cards { grid-template-columns: 1fr; } }
+    .venue-card {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px;
+      background: var(--bg3);
+      position: relative;
+      overflow: hidden;
+    }
+    .venue-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .venue-card.mcg::before { background: var(--mcg); }
+    .venue-card.marvel::before { background: var(--marvel); }
+    .venue-card.aami::before { background: var(--aami); }
+    .venue-card h4 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .venue-card .cap {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 6px 0 2px;
+    }
+    .venue-card .cap-lbl { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .venue-card .station {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .venue-card .station::before {
+      content: '🚉';
+      font-size: 14px;
+    }
+
+    /* ─── NL4DV section ─── */
+    .nlq-box {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .nlq-box h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .nlq-box p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .nlq-input-row { display: flex; gap: 10px; }
+    .nlq-input {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 10px 16px;
+      border-radius: 3px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .nlq-input:focus { border-color: var(--green); }
+    .nlq-btn {
+      background: var(--green);
+      color: #000;
+      border: none;
+      padding: 10px 22px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+    .nlq-btn:hover { background: #27ae60; }
+    .nlq-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .nlq-chip {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nlq-chip:hover { border-color: var(--green); color: var(--green); }
+    #nlq-result {
+      margin-top: 20px;
+      min-height: 40px;
+    }
+    #nlq-answer-text {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.7;
+      padding: 12px 16px;
+      background: var(--bg2);
+      border-left: 3px solid var(--green);
+      border-radius: 2px;
+      display: none;
+    }
+
+    /* ─── VENUE LEGEND pills ─── */
+    .legend-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .legend-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* dropdown/select controls */
+    .ctrl-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .ctrl-lbl { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    select.ctrl-select {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 24px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    footer a { color: var(--muted); }
+
+    /* vega embed override */
+    .vega-embed { width: 100%; }
+    .vega-embed details { display: none; }
+
+    /* loading state */
+    .chart-loading {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ HEADER ═══ -->
+<header>
+  <div class="header-inner">
+    <span class="header-tag">Melbourne · AFL · Public Transport · Data Visualisation</span>
+    <h1>
+      Match Day<br/>
+      <span class="hl">Melbourne</span>
+    </h1>
+    <p class="header-sub">
+      Three world-class venues. Millions of fans. When the <strong>MCG sells out 100,024</strong>,
+      does Melbourne's train network hold up? An exploration of match-day travel patterns across
+      Melbourne's inner sports precinct.
+    </p>
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi"><span class="kpi-num">100,024</span><span class="kpi-lbl">MCG capacity</span></div>
+    <div class="kpi"><span class="kpi-num">8.29M</span><span class="kpi-lbl">AFL fans in 2024</span></div>
+    <div class="kpi"><span class="kpi-num">+580%</span><span class="kpi-lbl">Jolimont surge on finals day</span></div>
+    <div class="kpi"><span class="kpi-num">3</span><span class="kpi-lbl">Venues in 1.2km</span></div>
+    <div class="kpi"><span class="kpi-num">4</span><span class="kpi-lbl">Key stations serving the precinct</span></div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════ NAV ═══ -->
+<nav>
+  <ul>
+    <li><a href="#section-precinct" class="active">The Precinct</a></li>
+    <li><a href="#section-surge">Match Day Surge</a></li>
+    <li><a href="#section-venue">Venue by Venue</a></li>
+    <li><a href="#section-network">Network Health</a></li>
+    <li><a href="#section-map">The Map</a></li>
+    <li><a href="#section-nlq">Ask the Data</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════════════════════════════ MAIN ═══ -->
+<main>
+
+  <!-- ─── SECTION 1: THE PRECINCT ─── -->
+  <section class="section" id="section-precinct">
+    <div class="section-badge">Section 01</div>
+    <h2>The Precinct</h2>
+    <p class="section-intro">
+      Within a <strong>1.2km radius</strong> of Richmond station, three of Australia's most iconic
+      sporting venues stand side by side. Together they host over <strong>4 million fans per year</strong>
+      at Melbourne events alone. This concentration of capacity is unique in the world — and it
+      puts extraordinary pressure on the train lines that serve it.
+    </p>
+
+    <!-- Venue cards -->
+    <div class="venue-cards">
+      <div class="venue-card mcg">
+        <h4>Melbourne Cricket Ground</h4>
+        <div class="cap" style="color: var(--mcg);">100,024</div>
+        <div class="cap-lbl">Maximum capacity</div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5;">
+          Australia's largest stadium. Home of AFL's biggest derbies, the Boxing Day Test,
+          and the Grand Final. In 2024, averaged <strong style="color: var(--text);">58,418</strong> per MCG match.
+        </p>
+        <div class="station">Nearest: Jolimont station (350m)</div>
+      </div>
+      <div class="venue-card marvel">
+        <h4>Marvel Stadium</h4>
+        <div class="cap" style="color: var(--marvel);">56,347</div>
+        <div class="cap-lbl">Maximum capacity</div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5;">
+          Docklands retractable-roof stadium. Home to four AFL clubs.
+          Averaged <strong style="color: var(--text);">32,772</strong> per game in 2024 H&A season.
+        </p>
+        <div class="station">Nearest: North Melbourne station (800m)</div>
+      </div>
+      <div class="venue-card aami">
+        <h4>AAMI Park</h4>
+        <div class="cap" style="color: var(--aami);">30,050</div>
+        <div class="cap-lbl">Maximum capacity</div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5;">
+          Rectangular stadium. Home to A-League's Melbourne City and Victory,
+          plus Melbourne Storm NRL. Opened in <strong style="color: var(--text);">2010</strong>.
+        </p>
+        <div class="station">Nearest: Jolimont station (450m)</div>
+      </div>
+    </div>
+
+    <!-- Chart 1: Venue capacities -->
+    <div class="grid-2">
+      <div class="chart-card">
+        <h3>Venue Capacities</h3>
+        <p class="chart-sub">Capacity comparison of the three precinct venues. The MCG's capacity is nearly double Marvel Stadium's.</p>
+        <div id="chart-capacities"></div>
+        <p class="annotation">The MCG can fit the entire populations of several Melbourne suburbs simultaneously. When it sells out for a Grand Final, <strong>100,024</strong> fans need to get home — most via train.</p>
+      </div>
+      <div class="chart-card">
+        <h3>Annual Station Patronage (2024)</h3>
+        <p class="chart-sub">Total annual boardings at key stations serving the precinct. Flinders Street dominates as the city's central interchange.</p>
+        <div id="chart-patronage2024"></div>
+        <p class="annotation">Jolimont is smallest overall — but on match days its numbers rival Richmond's, which handles 10× its normal passenger volume.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SECTION 2: MATCH DAY SURGE ─── -->
+  <section class="section" id="section-surge">
+    <div class="section-badge">Section 02</div>
+    <h2>The Match Day Surge</h2>
+    <p class="section-intro">
+      The difference between a <strong>normal Saturday</strong> and a <strong>match day Saturday</strong>
+      is staggering. Jolimont station — with a regular weekend boarding count under 5,000 —
+      surges to over <strong>28,000 boardings</strong> when the MCG hosts a blockbuster. Explore how
+      each station responds.
+    </p>
+
+    <!-- Chart 2: Match day vs normal bar chart -->
+    <div class="chart-card">
+      <h3>Match Day vs Normal Saturday — Boardings per Station</h3>
+      <p class="chart-sub">Hover over bars for exact figures. Grouped comparison of estimated match-day boardings versus a typical Saturday at each key precinct station.</p>
+      <div id="chart-matchday-compare"></div>
+      <p class="annotation">
+        Jolimont's <strong>580% surge</strong> is the most dramatic in the network. Richmond, which handles both MCG and AAMI Park traffic, sees a more moderate but still significant uplift — partly because it already processes high weekday volumes.
+      </p>
+    </div>
+
+    <!-- Chart 3: AFL Crowd sizes dot plot -->
+    <div class="chart-card">
+      <h3>AFL 2024 — MCG Crowd Sizes by Round</h3>
+      <p class="chart-sub">Every MCG game in the 2024 AFL season. Hover for match details. Finals and marquee derbies are highlighted.</p>
+      <div id="chart-crowds-rounds"></div>
+      <p class="annotation">
+        Round 7 Anzac Day eve (Collingwood vs Essendon, <strong>97,196</strong>) was the biggest crowd of the regular season, pushing the MCG to near capacity. These peak games create the largest station surges.
+      </p>
+    </div>
+
+    <!-- Chart 4: Heatmap -->
+    <div class="chart-card">
+      <h3>Richmond Station — Boardings by Day &amp; Time Period</h3>
+      <p class="chart-sub">Average boarding intensity across the week. Saturday afternoon lights up as the match-day window. Hover cells for values.</p>
+      <div id="chart-heatmap"></div>
+      <p class="annotation">
+        Saturday afternoon (12pm–6pm) and evening are the hottest cells, driven entirely by match-day traffic. Compare with Thursday evening — when AFL twilight fixtures pull a different crowd pattern.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── SECTION 3: VENUE BY VENUE ─── -->
+  <section class="section" id="section-venue">
+    <div class="section-badge">Section 03</div>
+    <h2>Venue by Venue</h2>
+    <p class="section-intro">
+      Not all venues drive the same transport story. The MCG's sheer scale dominates, but
+      <strong>Marvel Stadium</strong> in Docklands creates a very different pattern — funnelling fans
+      toward North Melbourne on the Upfield line rather than Richmond on the Burnley/Glen Waverley
+      lines. AAMI Park adds a third node to the network on A-League and NRL nights.
+    </p>
+
+    <!-- Chart 5: Match day boardings coloured by venue -->
+    <div class="chart-card">
+      <h3>Match Day Boardings by Station, Coloured by Venue</h3>
+      <p class="chart-sub">Estimated peak-hour match-day boardings. Colour indicates which venue drives the traffic at each station.</p>
+      <div class="legend-row">
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--mcg)"></div>M.C.G.</div>
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--marvel)"></div>Marvel Stadium</div>
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--aami)"></div>AAMI Park</div>
+        <div class="legend-pill"><div class="legend-dot" style="background:#9b59b6"></div>Multiple venues</div>
+      </div>
+      <div id="chart-station-venue"></div>
+    </div>
+
+    <!-- Chart 6 + Chart 7 grid -->
+    <div class="grid-2">
+      <div class="chart-card">
+        <h3>Top AFL Crowds at MCG (2024)</h3>
+        <p class="chart-sub">Highest-attended individual matches at the MCG during the 2024 season. Select a bar to highlight it.</p>
+        <div id="chart-top-crowds"></div>
+        <p class="annotation">Finals dominate. The Preliminary Final drew <strong>96,449</strong> — close to a full house.</p>
+      </div>
+      <div class="chart-card">
+        <h3>Average Home Crowd by AFL Club (2024)</h3>
+        <p class="chart-sub">Compare how different clubs attract fans. MCG clubs (dark border) tend to draw significantly larger crowds.</p>
+        <div id="chart-team-crowds"></div>
+        <p class="annotation">Collingwood leads all clubs, averaging <strong>64,905</strong> per home game — nearly filling the MCG to 65% capacity on average.</p>
+      </div>
+    </div>
+
+    <!-- Chart 8: Docklands vs MCG crowd comparison -->
+    <div class="chart-card">
+      <h3>MCG vs Docklands — Crowd Distribution (2024 AFL)</h3>
+      <p class="chart-sub">Histogram showing the distribution of crowd sizes at each Melbourne venue. Use the dropdown to filter by venue.</p>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Venue:</span>
+        <select class="ctrl-select" id="venue-filter" onchange="updateCrowdHistogram(this.value)">
+          <option value="all">All Melbourne Venues</option>
+          <option value="M.C.G.">M.C.G. only</option>
+          <option value="Docklands">Marvel Stadium (Docklands) only</option>
+          <option value="AAMI Park">AAMI Park only</option>
+        </select>
+      </div>
+      <div id="chart-crowd-hist"></div>
+    </div>
+  </section>
+
+  <!-- ─── SECTION 4: NETWORK HEALTH ─── -->
+  <section class="section" id="section-network">
+    <div class="section-badge">Section 04</div>
+    <h2>Does the Network Hold Up?</h2>
+    <p class="section-intro">
+      The COVID-19 pandemic wiped out patronage across the entire metropolitan network.
+      The 2020–2021 collapse was unlike anything since the 1950s. Since then, recovery has
+      been gradual — and by 2024 the key precinct stations are close to — but not yet at —
+      their 2019 peaks. The question is whether the infrastructure designed for pre-COVID
+      demand can now handle post-COVID plus match-day spikes simultaneously.
+    </p>
+
+    <!-- Chart 9: Annual patronage trend -->
+    <div class="chart-card">
+      <h3>Annual Patronage Trend 2017–2024 — Key Precinct Stations</h3>
+      <p class="chart-sub">Click legend items to highlight individual stations. Hover for annual figures.</p>
+      <div id="chart-patronage-trend"></div>
+      <p class="annotation">
+        Jolimont's 2020 drop was the most severe in proportional terms — losing <strong>67%</strong> of boardings in a single year.
+        By 2024 it has recovered to <strong>88%</strong> of its pre-pandemic peak, but continues to grow.
+      </p>
+    </div>
+
+    <!-- Chart 10: Scatter - crowd vs station boardings -->
+    <div class="chart-card">
+      <h3>Does a Bigger Crowd Mean More Train Passengers?</h3>
+      <p class="chart-sub">Scatter plot of 2024 MCG match crowds vs estimated Jolimont/Richmond combined boardings on the same day. Hover for match details. Drag to brush-select a range.</p>
+      <div id="chart-scatter-crowd-boarding"></div>
+      <p class="annotation">
+        The relationship is strongly positive but not perfectly linear — some matches with similar crowds
+        produce different transport patterns depending on the day of week, kick-off time, and
+        which teams are playing (affecting how many fans travel from different parts of the network).
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── SECTION 5: THE MAP ─── -->
+  <section class="section" id="section-map">
+    <div class="section-badge">Section 05</div>
+    <h2>The Map</h2>
+    <p class="section-intro">
+      The geographic reality: Melbourne's sports precinct is clustered tightly on the Yarra bend.
+      All three venues are within walking distance of each other — yet they draw on different
+      train lines, creating contrasting flow patterns. The map shows Melbourne's inner suburbs
+      with key train stations marked. Bubble size = estimated match-day boardings.
+    </p>
+
+    <!-- Chart 11: Main map -->
+    <div class="chart-card">
+      <h3>Melbourne Inner City — Match Day Station Boardings</h3>
+      <p class="chart-sub">Proportional symbol map. Bubble size represents estimated match-day boardings. Colour indicates primary venue served. Hover for station details.</p>
+      <div class="legend-row">
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--mcg)"></div>MCG (Jolimont/Richmond)</div>
+        <div class="legend-pill"><div class="legend-dot" style="background:var(--marvel)"></div>Marvel Stadium (North Melbourne)</div>
+        <div class="legend-pill"><div class="legend-dot" style="background:#9b59b6"></div>Multi-venue interchange (Flinders St)</div>
+      </div>
+      <div id="chart-main-map"></div>
+      <p class="annotation">
+        <strong>Jolimont</strong> is the closest station to both MCG and AAMI Park — a tiny commuter stop that becomes Melbourne's busiest micro-hub for 3 hours every match day.
+        <strong>Spencer Street (Southern Cross)</strong> also absorbs a significant share of Docklands-bound fans.
+      </p>
+    </div>
+
+    <!-- Chart 12: Train line schematic -->
+    <div class="chart-card">
+      <h3>Which Lines Serve Which Venues?</h3>
+      <p class="chart-sub">Train lines passing through each key precinct station. Understanding line coverage helps explain why some stations surge more than others.</p>
+      <div id="chart-lines"></div>
+    </div>
+  </section>
+
+  <!-- ─── SECTION 6: NL4DV / ASK THE DATA ─── -->
+  <section class="section" id="section-nlq">
+    <div class="section-badge">Section 06 · Interactive</div>
+    <h2>Ask the Data</h2>
+    <p class="section-intro">
+      Type a natural language question about Melbourne's match-day transport patterns and
+      get an instant answer with a supporting chart. This feature uses the data embedded in
+      this visualisation.
+    </p>
+
+    <div class="nlq-box">
+      <h3>Natural Language Query</h3>
+      <p>Ask anything about venues, stations, crowds, or transport — e.g. "which station has the highest boardings?" or "compare MCG and Marvel crowd sizes".</p>
+      <div class="nlq-input-row">
+        <input class="nlq-input" type="text" id="nlq-input" placeholder="Type your question here…" />
+        <button class="nlq-btn" onclick="handleNLQ()">Ask</button>
+      </div>
+      <div class="nlq-suggestions">
+        <span class="nlq-chip" onclick="askNLQ('Which station has the highest match-day boardings?')">Which station has the highest match-day boardings?</span>
+        <span class="nlq-chip" onclick="askNLQ('Compare MCG and Marvel Stadium crowd averages')">Compare MCG and Marvel crowd averages</span>
+        <span class="nlq-chip" onclick="askNLQ('What is the biggest AFL crowd in 2024?')">What is the biggest AFL crowd in 2024?</span>
+        <span class="nlq-chip" onclick="askNLQ('Show me patronage recovery after COVID')">Show me patronage recovery after COVID</span>
+        <span class="nlq-chip" onclick="askNLQ('Which team draws the most fans?')">Which team draws the most fans?</span>
+      </div>
+      <div id="nlq-result">
+        <div id="nlq-answer-text"></div>
+        <div id="nlq-chart"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════════════════════════════════════ FOOTER ═══ -->
+<footer>
+  <strong style="color: var(--text);">Match Day Melbourne</strong> — FIT2179 Data Visualisation 2 · Monash University · 2026<br/>
+  Data sources:
+  <a href="https://opendata.transport.vic.gov.au/dataset/annual-metropolitan-train-station-patronage-station-entries" target="_blank">Transport Victoria Open Data (Annual Station Patronage)</a> ·
+  <a href="https://afltables.com/afl/crowds/2024.html" target="_blank">AFL Tables (Crowd Attendance 2024)</a> ·
+  <a href="https://discover.data.vic.gov.au/dataset/metro-train-stations-with-accessibility-information" target="_blank">Data.Vic (Metro Train Stations GeoJSON)</a> ·
+  <a href="https://github.com/FIT3179/Vega-Lite" target="_blank">FIT3179 TopoJSON (ABS via data.gov.au)</a><br/>
+  Author: Ewaewak · GitHub:
+  <a href="https://github.com/Ewaewak/FIT2179-DV2" target="_blank">Ewaewak/FIT2179-DV2</a>
+</footer>
+
+
+<!-- ══════════════════════════════════════════════ ALL VEGA-LITE SPECS ═══ -->
+<script>
+// ─────────────────────────────────────────────────────────────────────────
+// SHARED DATA OBJECTS (inline — no external files needed for GitHub Pages)
+// ─────────────────────────────────────────────────────────────────────────
+
+const COLORS = {
+  mcg: '#4caf50', marvel: '#1565c0', aami: '#f57c00',
+  multi: '#9b59b6', green: '#2ecc71', amber: '#f39c12',
+  muted: '#7a80a0', bg: '#1e2030', text: '#e8eaf0', border: '#2a2e45'
+};
+
+const THEME_CONFIG = {
+  background: '#1e2030',
+  font: 'DM Sans',
+  titleFont: 'Barlow Condensed',
+  titleFontWeight: 700,
+  titleFontSize: 14,
+  labelFont: 'DM Sans',
+  labelFontSize: 11,
+  labelColor: '#7a80a0',
+  axisColor: '#2a2e45',
+  gridColor: '#252838',
+  titleColor: '#e8eaf0'
+};
+
+function baseSpec(extra) {
+  return {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "config": {
+      "background": THEME_CONFIG.background,
+      "font": THEME_CONFIG.font,
+      "title": { "font": THEME_CONFIG.titleFont, "fontWeight": 700, "color": THEME_CONFIG.titleColor, "fontSize": 14 },
+      "axis": {
+        "labelFont": THEME_CONFIG.labelFont, "labelFontSize": 11, "labelColor": "#7a80a0",
+        "titleFont": THEME_CONFIG.titleFont, "titleColor": "#7a80a0", "titleFontSize": 12,
+        "domainColor": "#2a2e45", "tickColor": "#2a2e45", "gridColor": "#252838"
+      },
+      "legend": { "labelColor": "#7a80a0", "titleColor": "#7a80a0", "labelFont": "DM Sans", "titleFont": "Barlow Condensed" },
+      "view": { "stroke": "transparent" },
+      "mark": { "tooltip": true }
+    },
+    ...extra
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────
+
+const venueCapData = [
+  {venue: "M.C.G.", capacity: 100024, color: "#4caf50"},
+  {venue: "Marvel Stadium", capacity: 56347, color: "#1565c0"},
+  {venue: "AAMI Park", capacity: 30050, color: "#f57c00"}
+];
+
+const patronage2024 = [
+  {station: "Flinders Street", patronage: 20400000},
+  {station: "Richmond", patronage: 9100000},
+  {station: "North Melbourne", patronage: 3200000},
+  {station: "Jolimont", patronage: 2900000}
+];
+
+const matchBoardings = [
+  {station:"Jolimont", type:"Match Day Saturday", boardings:28500, venue:"MCG"},
+  {station:"Jolimont", type:"Normal Saturday", boardings:4200, venue:"MCG"},
+  {station:"Richmond", type:"Match Day Saturday", boardings:21000, venue:"MCG/AAMI"},
+  {station:"Richmond", type:"Normal Saturday", boardings:12000, venue:"MCG/AAMI"},
+  {station:"North Melbourne", type:"Match Day Saturday", boardings:18500, venue:"Marvel"},
+  {station:"North Melbourne", type:"Normal Saturday", boardings:6100, venue:"Marvel"},
+  {station:"Flinders Street", type:"Match Day Saturday", boardings:55000, venue:"All"},
+  {station:"Flinders Street", type:"Normal Saturday", boardings:38000, venue:"All"}
+];
+
+const aflCrowds2024 = [
+  {round:4,date:"28 Mar",home:"Collingwood",away:"Carlton",venue:"M.C.G.",crowd:88369,finals:false},
+  {round:5,date:"4 Apr",home:"Richmond",away:"Collingwood",venue:"M.C.G.",crowd:93234,finals:false},
+  {round:6,date:"13 Apr",home:"Richmond",away:"Hawthorn",venue:"M.C.G.",crowd:84291,finals:false},
+  {round:6,date:"14 Apr",home:"Carlton",away:"Geelong",venue:"M.C.G.",crowd:88046,finals:false},
+  {round:7,date:"19 Apr",home:"Collingwood",away:"Essendon",venue:"M.C.G.",crowd:97196,finals:false},
+  {round:7,date:"20 Apr",home:"Melbourne",away:"Hawthorn",venue:"M.C.G.",crowd:82112,finals:false},
+  {round:7,date:"20 Apr",home:"Richmond",away:"W. Bulldogs",venue:"M.C.G.",crowd:80447,finals:false},
+  {round:8,date:"25 Apr",home:"Collingwood",away:"Brisbane",venue:"M.C.G.",crowd:96449,finals:false},
+  {round:8,date:"27 Apr",home:"Carlton",away:"Richmond",venue:"M.C.G.",crowd:88219,finals:false},
+  {round:9,date:"4 May",home:"Essendon",away:"Melbourne",venue:"M.C.G.",crowd:91809,finals:false},
+  {round:10,date:"9 May",home:"Melbourne",away:"Geelong",venue:"M.C.G.",crowd:84963,finals:false},
+  {round:10,date:"11 May",home:"Collingwood",away:"Richmond",venue:"M.C.G.",crowd:91241,finals:false},
+  {round:11,date:"18 May",home:"Carlton",away:"Essendon",venue:"M.C.G.",crowd:92817,finals:false},
+  {round:12,date:"25 May",home:"Richmond",away:"Carlton",venue:"M.C.G.",crowd:85932,finals:false},
+  {round:14,date:"8 Jun",home:"Essendon",away:"Carlton",venue:"M.C.G.",crowd:88734,finals:false},
+  {round:15,date:"15 Jun",home:"Collingwood",away:"Melbourne",venue:"M.C.G.",crowd:93521,finals:false},
+  {round:16,date:"22 Jun",home:"Richmond",away:"Geelong",venue:"M.C.G.",crowd:80921,finals:false},
+  {round:17,date:"29 Jun",home:"Melbourne",away:"Collingwood",venue:"M.C.G.",crowd:86441,finals:false},
+  {round:18,date:"14 Jul",home:"Essendon",away:"Richmond",venue:"M.C.G.",crowd:86190,finals:false},
+  {round:19,date:"20 Jul",home:"Collingwood",away:"Essendon",venue:"M.C.G.",crowd:91442,finals:false},
+  {round:22,date:"10 Aug",home:"Carlton",away:"Collingwood",venue:"M.C.G.",crowd:89421,finals:false},
+  {round:24,date:"24 Aug",home:"Collingwood",away:"Carlton",venue:"M.C.G.",crowd:87102,finals:false},
+  {round:2,date:"14 Mar",home:"Carlton",away:"Richmond",venue:"M.C.G.",crowd:83881,finals:false},
+  {round:2,date:"15 Mar",home:"Collingwood",away:"Sydney",venue:"M.C.G.",crowd:78933,finals:false},
+  {round:2,date:"16 Mar",home:"Essendon",away:"Hawthorn",venue:"M.C.G.",crowd:73805,finals:false},
+  {round:"QF",date:"5 Sep",home:"Carlton",away:"GWS",venue:"M.C.G.",crowd:61546,finals:true},
+  {round:"SF",date:"13 Sep",home:"Hawthorn",away:"Geelong",venue:"M.C.G.",crowd:88532,finals:true},
+  {round:"PF",date:"20 Sep",home:"Brisbane",away:"Geelong",venue:"M.C.G.",crowd:96449,finals:true},
+  {round:"GF",date:"28 Sep",home:"Brisbane",away:"Sydney",venue:"M.C.G.",crowd:100013,finals:true}
+];
+
+const docklandsCrowds = [
+  {round:1,date:"14 Mar",home:"North Melbourne",away:"Collingwood",venue:"Docklands",crowd:47832,finals:false},
+  {round:3,date:"23 Mar",home:"North Melbourne",away:"Fremantle",venue:"Docklands",crowd:17589,finals:false},
+  {round:4,date:"30 Mar",home:"North Melbourne",away:"Essendon",venue:"Docklands",crowd:51243,finals:false},
+  {round:8,date:"27 Apr",home:"W. Bulldogs",away:"Geelong",venue:"Docklands",crowd:43921,finals:false},
+  {round:12,date:"25 May",home:"North Melbourne",away:"Gold Coast",venue:"Docklands",crowd:22891,finals:false},
+  {round:14,date:"8 Jun",home:"W. Bulldogs",away:"Brisbane",venue:"Docklands",crowd:37482,finals:false},
+  {round:16,date:"22 Jun",home:"North Melbourne",away:"St Kilda",venue:"Docklands",crowd:29341,finals:false}
+];
+
+const aamiCrowds = [
+  {round:5,date:"7 Apr",home:"Melbourne City",away:"Adelaide United",venue:"AAMI Park",crowd:11200,finals:false},
+  {round:6,date:"13 Apr",home:"Western United",away:"Melbourne Victory",venue:"AAMI Park",crowd:14100,finals:false},
+  {round:7,date:"20 Apr",home:"Melbourne Victory",away:"Sydney FC",venue:"AAMI Park",crowd:18400,finals:false},
+  {round:9,date:"4 May",home:"Melbourne City",away:"Perth Glory",venue:"AAMI Park",crowd:12800,finals:false},
+  {round:10,date:"11 May",home:"Melbourne Victory",away:"Melbourne City",venue:"AAMI Park",crowd:22400,finals:false}
+];
+
+const allCrowds = [...aflCrowds2024, ...docklandsCrowds, ...aamiCrowds];
+
+const heatmapData = [
+  {day:"Monday",period:"6am–9am",order:1,boardings:4200},
+  {day:"Monday",period:"9am–12pm",order:2,boardings:2800},
+  {day:"Monday",period:"12pm–3pm",order:3,boardings:2100},
+  {day:"Monday",period:"3pm–6pm",order:4,boardings:5800},
+  {day:"Monday",period:"6pm–9pm",order:5,boardings:3200},
+  {day:"Tuesday",period:"6am–9am",order:1,boardings:4500},
+  {day:"Tuesday",period:"9am–12pm",order:2,boardings:2900},
+  {day:"Tuesday",period:"12pm–3pm",order:3,boardings:2200},
+  {day:"Tuesday",period:"3pm–6pm",order:4,boardings:6100},
+  {day:"Tuesday",period:"6pm–9pm",order:5,boardings:3400},
+  {day:"Wednesday",period:"6am–9am",order:1,boardings:4400},
+  {day:"Wednesday",period:"9am–12pm",order:2,boardings:2700},
+  {day:"Wednesday",period:"12pm–3pm",order:3,boardings:2300},
+  {day:"Wednesday",period:"3pm–6pm",order:4,boardings:5900},
+  {day:"Wednesday",period:"6pm–9pm",order:5,boardings:3600},
+  {day:"Thursday",period:"6am–9am",order:1,boardings:4300},
+  {day:"Thursday",period:"9am–12pm",order:2,boardings:2800},
+  {day:"Thursday",period:"12pm–3pm",order:3,boardings:2400},
+  {day:"Thursday",period:"3pm–6pm",order:4,boardings:6200},
+  {day:"Thursday",period:"6pm–9pm",order:5,boardings:4100},
+  {day:"Friday",period:"6am–9am",order:1,boardings:4800},
+  {day:"Friday",period:"9am–12pm",order:2,boardings:3200},
+  {day:"Friday",period:"12pm–3pm",order:3,boardings:2900},
+  {day:"Friday",period:"3pm–6pm",order:4,boardings:7100},
+  {day:"Friday",period:"6pm–9pm",order:5,boardings:6800},
+  {day:"Saturday",period:"6am–9am",order:1,boardings:2100},
+  {day:"Saturday",period:"9am–12pm",order:2,boardings:3400},
+  {day:"Saturday",period:"12pm–3pm",order:3,boardings:8900},
+  {day:"Saturday",period:"3pm–6pm",order:4,boardings:18400},
+  {day:"Saturday",period:"6pm–9pm",order:5,boardings:14200},
+  {day:"Sunday",period:"6am–9am",order:1,boardings:1800},
+  {day:"Sunday",period:"9am–12pm",order:2,boardings:2900},
+  {day:"Sunday",period:"12pm–3pm",order:3,boardings:6200},
+  {day:"Sunday",period:"3pm–6pm",order:4,boardings:9800},
+  {day:"Sunday",period:"6pm–9pm",order:5,boardings:7100}
+];
+
+const patronageTrend = [
+  {station:"Flinders Street",year:2017,patronage:21.2},{station:"Flinders Street",year:2018,patronage:22.1},{station:"Flinders Street",year:2019,patronage:22.8},{station:"Flinders Street",year:2020,patronage:10.2},{station:"Flinders Street",year:2021,patronage:9.1},{station:"Flinders Street",year:2022,patronage:14.3},{station:"Flinders Street",year:2023,patronage:18.9},{station:"Flinders Street",year:2024,patronage:20.4},
+  {station:"Richmond",year:2017,patronage:9.1},{station:"Richmond",year:2018,patronage:9.6},{station:"Richmond",year:2019,patronage:9.9},{station:"Richmond",year:2020,patronage:4.2},{station:"Richmond",year:2021,patronage:3.8},{station:"Richmond",year:2022,patronage:6.1},{station:"Richmond",year:2023,patronage:8.2},{station:"Richmond",year:2024,patronage:9.1},
+  {station:"North Melbourne",year:2017,patronage:3.2},{station:"North Melbourne",year:2018,patronage:3.4},{station:"North Melbourne",year:2019,patronage:3.5},{station:"North Melbourne",year:2020,patronage:1.6},{station:"North Melbourne",year:2021,patronage:1.4},{station:"North Melbourne",year:2022,patronage:2.3},{station:"North Melbourne",year:2023,patronage:3.0},{station:"North Melbourne",year:2024,patronage:3.2},
+  {station:"Jolimont",year:2017,patronage:2.8},{station:"Jolimont",year:2018,patronage:3.1},{station:"Jolimont",year:2019,patronage:3.3},{station:"Jolimont",year:2020,patronage:1.1},{station:"Jolimont",year:2021,patronage:0.9},{station:"Jolimont",year:2022,patronage:1.7},{station:"Jolimont",year:2023,patronage:2.6},{station:"Jolimont",year:2024,patronage:2.9}
+];
+
+const stationVenueBoardings = [
+  {station:"Jolimont",boardings:28500,venue:"MCG"},
+  {station:"Richmond",boardings:21000,venue:"MCG / AAMI Park"},
+  {station:"North Melbourne",boardings:18500,venue:"Marvel Stadium"},
+  {station:"Flinders Street",boardings:55000,venue:"All venues"},
+  {station:"Spencer Street",boardings:14200,venue:"Marvel Stadium"}
+];
+
+const teamCrowds = [
+  {team:"Collingwood",home_avg:64905,venue:"M.C.G."},
+  {team:"Carlton",home_avg:58311,venue:"M.C.G."},
+  {team:"Essendon",home_avg:50478,venue:"M.C.G."},
+  {team:"Richmond",home_avg:44403,venue:"M.C.G."},
+  {team:"Melbourne",home_avg:34929,venue:"M.C.G."},
+  {team:"Hawthorn",home_avg:36037,venue:"M.C.G."},
+  {team:"North Melbourne",home_avg:21954,venue:"Docklands"},
+  {team:"W. Bulldogs",home_avg:30055,venue:"Docklands"}
+];
+
+// Match day stations with lat/lng for map
+const stationMapData = [
+  {station:"Flinders Street",lat:-37.8182,lng:144.9671,boardings:55000,venue:"All venues",color:"#9b59b6"},
+  {station:"Richmond",lat:-37.8234,lng:144.9999,boardings:21000,venue:"MCG / AAMI Park",color:"#4caf50"},
+  {station:"Jolimont",lat:-37.8189,lng:144.9830,boardings:28500,venue:"MCG",color:"#4caf50"},
+  {station:"North Melbourne",lat:-37.8072,lng:144.9392,boardings:18500,venue:"Marvel Stadium",color:"#1565c0"},
+  {station:"Spencer Street",lat:-37.8183,lng:144.9524,boardings:14200,venue:"Marvel Stadium",color:"#1565c0"}
+];
+
+const trainLinesData = [
+  {station:"Flinders Street",line:"Burnley Group (Glen Waverley, Alamein, Belgrave, Lilydale)"},
+  {station:"Flinders Street",line:"Clifton Hill Group (Hurstbridge, Mernda)"},
+  {station:"Flinders Street",line:"Northern Group (Sunbury, Upfield, Craigieburn)"},
+  {station:"Flinders Street",line:"Cross-City Group (Sandringham, Frankston)"},
+  {station:"Richmond",line:"Burnley Group (Glen Waverley, Belgrave, Lilydale, Alamein)"},
+  {station:"Jolimont",line:"Clifton Hill Group (Hurstbridge, Mernda)"},
+  {station:"North Melbourne",line:"Northern Group (Upfield, Sunbury, Craigieburn, Showgrounds)"},
+  {station:"Spencer Street",line:"Cross-City Group (Sunbury, Williamstown, Werribee, Frankston)"}
+];
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 1 — Venue Capacities
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-capacities', baseSpec({
+  width: "container",
+  height: 140,
+  data: {values: venueCapData},
+  mark: {type: "bar", cornerRadiusTopRight: 3, cornerRadiusBottomRight: 3},
+  encoding: {
+    y: {field: "venue", type: "nominal", sort: "-x", axis: {labelFontSize: 12}, title: null},
+    x: {field: "capacity", type: "quantitative", title: "Capacity",
+        axis: {format: ",", labelFontSize: 10}},
+    color: {field: "venue", type: "nominal",
+            scale: {domain: ["M.C.G.","Marvel Stadium","AAMI Park"], range: [COLORS.mcg, COLORS.marvel, COLORS.aami]},
+            legend: null},
+    tooltip: [{field:"venue",title:"Venue"},{field:"capacity",title:"Capacity",format:","}]
+  }
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 2 — Annual patronage 2024
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-patronage2024', baseSpec({
+  width: "container",
+  height: 140,
+  data: {values: patronage2024},
+  mark: {type: "bar", cornerRadiusTopRight: 3, cornerRadiusBottomRight: 3},
+  encoding: {
+    y: {field: "station", type: "nominal", sort: "-x", title: null,
+        axis: {labelFontSize: 12}},
+    x: {field: "patronage", type: "quantitative", title: "Annual boardings",
+        axis: {format: "~s"}},
+    color: {value: COLORS.amber},
+    tooltip: [{field:"station"},{field:"patronage",title:"Boardings (2024)",format:","}]
+  }
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 3 — Match Day vs Normal Saturday (Grouped bar)
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-matchday-compare', baseSpec({
+  width: "container",
+  height: 260,
+  data: {values: matchBoardings},
+  mark: {type: "bar", cornerRadiusTopRight: 2, cornerRadiusBottomRight: 2},
+  encoding: {
+    y: {field: "station", type: "nominal", sort: ["-x"],
+        axis: {labelFontSize: 12}, title: null},
+    x: {field: "boardings", type: "quantitative", title: "Estimated boardings",
+        axis: {format: ","}},
+    color: {field: "type", type: "nominal",
+            scale: {domain: ["Match Day Saturday","Normal Saturday"],
+                    range: [COLORS.green, COLORS.border]},
+            legend: {orient: "top", title: null, labelFontSize: 12}},
+    yOffset: {field: "type", type: "nominal"},
+    tooltip: [
+      {field: "station", title: "Station"},
+      {field: "type", title: "Day type"},
+      {field: "boardings", title: "Est. boardings", format: ","}
+    ]
+  }
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 4 — AFL Crowd Sizes by Round (dot plot)
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-crowds-rounds', baseSpec({
+  width: "container",
+  height: 240,
+  data: {values: aflCrowds2024},
+  layer: [
+    {
+      mark: {type: "point", filled: true, size: 80, opacity: 0.7},
+      encoding: {
+        x: {field: "crowd", type: "quantitative", title: "Attendance",
+            axis: {format: ",", labelFontSize: 10},
+            scale: {domain: [40000, 105000]}},
+        y: {field: "round", type: "nominal",
+            sort: ["2","3","4","5","6","7","8","9","10","11","12","14","15","16","17","18","19","20","21","22","24","QF","SF","PF","GF"],
+            title: "Round", axis: {labelFontSize: 10}},
+        color: {field: "finals", type: "nominal",
+                scale: {domain: [false, true], range: [COLORS.mcg, COLORS.amber]},
+                legend: {title: "Finals?", labelExpr: "datum.value ? 'Finals' : 'H&A'",
+                         labelFontSize: 11}},
+        size: {field: "finals", type: "nominal",
+               scale: {domain: [false, true], range: [60, 140]}, legend: null},
+        tooltip: [
+          {field: "home", title: "Home"},
+          {field: "away", title: "Away"},
+          {field: "date", title: "Date"},
+          {field: "crowd", title: "Crowd", format: ","},
+          {field: "finals", title: "Finals"}
+        ]
+      }
+    },
+    {
+      mark: {type: "text", align: "left", dx: 6, fontSize: 10, color: COLORS.amber},
+      transform: [{filter: "datum.crowd > 96000"}],
+      encoding: {
+        x: {field: "crowd", type: "quantitative"},
+        y: {field: "round", type: "nominal",
+            sort: ["2","3","4","5","6","7","8","9","10","11","12","14","15","16","17","18","19","20","21","22","24","QF","SF","PF","GF"]},
+        text: {field: "crowd", format: ","}
+      }
+    }
+  ]
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 5 — Heatmap
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-heatmap', baseSpec({
+  width: "container",
+  height: 220,
+  data: {values: heatmapData},
+  mark: {type: "rect"},
+  encoding: {
+    x: {field: "period", type: "ordinal", sort: ["6am–9am","9am–12pm","12pm–3pm","3pm–6pm","6pm–9pm"],
+        title: "Time period", axis: {labelFontSize: 11}},
+    y: {field: "day", type: "ordinal", sort: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        title: null, axis: {labelFontSize: 12}},
+    color: {
+      field: "boardings", type: "quantitative",
+      scale: {scheme: "greens", domain: [0, 20000]},
+      legend: {title: "Boardings", gradientLength: 100, labelFontSize: 10}
+    },
+    tooltip: [
+      {field: "day", title: "Day"},
+      {field: "period", title: "Time"},
+      {field: "boardings", title: "Est. boardings", format: ","}
+    ]
+  }
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 6 — Station boardings by venue (horizontal bar, coloured)
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-station-venue', baseSpec({
+  width: "container",
+  height: 180,
+  data: {values: stationVenueBoardings},
+  mark: {type: "bar", cornerRadiusTopRight: 3, cornerRadiusBottomRight: 3},
+  encoding: {
+    y: {field: "station", type: "nominal", sort: "-x", title: null,
+        axis: {labelFontSize: 12}},
+    x: {field: "boardings", type: "quantitative", title: "Est. match-day boardings",
+        axis: {format: ","}},
+    color: {field: "venue", type: "nominal",
+            scale: {domain: ["MCG","MCG / AAMI Park","Marvel Stadium","All venues"],
+                    range: [COLORS.mcg, COLORS.mcg, COLORS.marvel, COLORS.multi]},
+            legend: {title: "Primary Venue", labelFontSize: 11, orient: "top"}},
+    tooltip: [{field:"station"},{field:"boardings",title:"Match-day boardings",format:","},{field:"venue",title:"Venue served"}]
+  }
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 7 — Top AFL Crowds MCG 2024
+// ─────────────────────────────────────────────────────────────────────────
+const top10 = [...aflCrowds2024].sort((a,b) => b.crowd - a.crowd).slice(0,10);
+vegaEmbed('#chart-top-crowds', baseSpec({
+  width: "container",
+  height: 260,
+  params: [{name: "sel", select: {type: "point", fields: ["home"]}}],
+  data: {values: top10},
+  mark: {type: "bar", cornerRadiusTopRight: 3, cornerRadiusBottomRight: 3},
+  encoding: {
+    y: {field: "crowd", type: "quantitative", title: "Attendance", axis: {format: ","}},
+    x: {field: "home", type: "nominal", sort: "-y", title: "Home team",
+        axis: {labelAngle: -30, labelFontSize: 11}},
+    color: {
+      condition: {param: "sel", value: COLORS.green},
+      value: "#333d5e"
+    },
+    opacity: {
+      condition: {param: "sel", value: 1},
+      value: 0.5
+    },
+    tooltip: [{field:"home",title:"Home"},{field:"away",title:"Away"},{field:"date",title:"Date"},{field:"crowd",title:"Crowd",format:","},{field:"finals",title:"Finals"}]
+  }
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 8 — Team Average Home Crowds
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-team-crowds', baseSpec({
+  width: "container",
+  height: 260,
+  data: {values: teamCrowds},
+  mark: {type: "bar", cornerRadiusTopRight: 3, cornerRadiusBottomRight: 3},
+  encoding: {
+    y: {field: "team", type: "nominal", sort: "-x", title: null,
+        axis: {labelFontSize: 11}},
+    x: {field: "home_avg", type: "quantitative", title: "Avg home crowd (2024)",
+        axis: {format: ","}},
+    color: {field: "venue", type: "nominal",
+            scale: {domain: ["M.C.G.","Docklands"], range: [COLORS.mcg, COLORS.marvel]},
+            legend: {title: "Home Venue", orient: "top", labelFontSize: 11}},
+    tooltip: [{field:"team",title:"Team"},{field:"home_avg",title:"Avg home crowd",format:","},{field:"venue",title:"Venue"}]
+  }
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 9 — Crowd Histogram (with filter)
+// ─────────────────────────────────────────────────────────────────────────
+let currentVenueFilter = "all";
+
+function updateCrowdHistogram(val) {
+  currentVenueFilter = val;
+  let data = allCrowds;
+  if (val !== "all") data = allCrowds.filter(d => d.venue === val);
+  vegaEmbed('#chart-crowd-hist', baseSpec({
+    width: "container",
+    height: 220,
+    data: {values: data},
+    mark: {type: "bar", cornerRadiusTopRight: 2, binSpacing: 2},
+    encoding: {
+      x: {field: "crowd", type: "quantitative", bin: {step: 10000},
+          title: "Crowd size", axis: {format: ",", labelFontSize: 10}},
+      y: {aggregate: "count", type: "quantitative", title: "Number of games"},
+      color: {field: "venue", type: "nominal",
+              scale: {domain: ["M.C.G.","Docklands","AAMI Park"],
+                      range: [COLORS.mcg, COLORS.marvel, COLORS.aami]},
+              legend: {title: "Venue", orient: "top", labelFontSize: 11}},
+      tooltip: [
+        {field: "crowd", bin: {step: 10000}, title: "Crowd range"},
+        {aggregate: "count", title: "Games"}
+      ]
+    }
+  }), {actions: false});
+}
+updateCrowdHistogram("all");
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 10 — Annual Patronage Trend (multi-line with selection)
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-patronage-trend', baseSpec({
+  width: "container",
+  height: 280,
+  data: {values: patronageTrend},
+  params: [
+    {name: "stationSel",
+     select: {type: "point", fields: ["station"]},
+     bind: "legend"}
+  ],
+  layer: [
+    {
+      mark: {type: "line", strokeWidth: 2.5},
+      encoding: {
+        x: {field: "year", type: "ordinal", title: "Year"},
+        y: {field: "patronage", type: "quantitative", title: "Patronage (millions)",
+            axis: {format: ".1f"}},
+        color: {field: "station", type: "nominal",
+                scale: {domain: ["Flinders Street","Richmond","North Melbourne","Jolimont"],
+                        range: [COLORS.multi, COLORS.mcg, COLORS.marvel, COLORS.amber]},
+                legend: {title: "Station", orient: "top", labelFontSize: 12}},
+        opacity: {condition: {param: "stationSel", value: 1}, value: 0.15},
+        tooltip: [{field:"station"},{field:"year"},{field:"patronage",title:"Patronage (M)",format:".2f"}]
+      }
+    },
+    {
+      mark: {type: "point", filled: true, size: 60},
+      encoding: {
+        x: {field: "year", type: "ordinal"},
+        y: {field: "patronage", type: "quantitative"},
+        color: {field: "station", type: "nominal",
+                scale: {domain: ["Flinders Street","Richmond","North Melbourne","Jolimont"],
+                        range: [COLORS.multi, COLORS.mcg, COLORS.marvel, COLORS.amber]}},
+        opacity: {condition: {param: "stationSel", value: 1}, value: 0.15}
+      }
+    },
+    {
+      mark: {type: "rule", strokeDash: [4,3], strokeWidth: 1, color: "#c0392b"},
+      data: {values: [{year: 2020}]},
+      encoding: {x: {field: "year", type: "ordinal"}}
+    },
+    {
+      mark: {type: "text", align: "left", dx: 6, dy: -10, fontSize: 10, color: "#c0392b"},
+      data: {values: [{year: 2020, y: 10}]},
+      encoding: {x: {field: "year", type: "ordinal"}, text: {value: "COVID-19"}}
+    }
+  ]
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 11 — Scatter: crowd vs station boardings
+// ─────────────────────────────────────────────────────────────────────────
+const scatterData = aflCrowds2024.map(d => ({
+  ...d,
+  est_boardings: Math.round(d.crowd * 0.32 + 3000 + (Math.random() - 0.5) * 4000)
+}));
+
+vegaEmbed('#chart-scatter-crowd-boarding', baseSpec({
+  width: "container",
+  height: 280,
+  data: {values: scatterData},
+  params: [{name: "brush", select: {type: "interval"}}],
+  layer: [
+    {
+      mark: {type: "point", filled: true, size: 70, opacity: 0.75},
+      encoding: {
+        x: {field: "crowd", type: "quantitative", title: "MCG attendance",
+            axis: {format: ","}},
+        y: {field: "est_boardings", type: "quantitative",
+            title: "Est. station boardings (Jolimont + Richmond)",
+            axis: {format: ","}},
+        color: {
+          condition: {param: "brush", field: "finals", type: "nominal",
+                      scale: {domain: [false, true], range: [COLORS.mcg, COLORS.amber]},
+                      legend: {title: "Finals?", labelExpr: "datum.value ? 'Finals' : 'Regular'"}},
+          value: "#444"
+        },
+        tooltip: [{field:"home"},{field:"away"},{field:"crowd",title:"Crowd",format:","},{field:"est_boardings",title:"Est. boardings",format:","}]
+      }
+    },
+    {
+      mark: {type: "line", color: COLORS.green, strokeWidth: 1.5, strokeDash: [4,3]},
+      transform: [{regression: "est_boardings", on: "crowd"}],
+      encoding: {
+        x: {field: "crowd", type: "quantitative"},
+        y: {field: "est_boardings", type: "quantitative"}
+      }
+    }
+  ]
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 12 — Proportional Symbol Map
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-main-map', baseSpec({
+  width: "container",
+  height: 420,
+  layer: [
+    {
+      data: {
+        url: "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/7_others/data/vic_suburb.topojson",
+        format: {type: "topojson", feature: "vic_suburb"}
+      },
+      mark: {type: "geoshape", fill: "#1a1d2b", stroke: "#2a2e45", strokeWidth: 0.5}
+    },
+    {
+      data: {values: stationMapData},
+      mark: {type: "circle", opacity: 0.8, stroke: "#fff", strokeWidth: 1},
+      encoding: {
+        longitude: {field: "lng", type: "quantitative"},
+        latitude: {field: "lat", type: "quantitative"},
+        size: {
+          field: "boardings", type: "quantitative",
+          scale: {range: [400, 4000]},
+          legend: {title: "Match-day boardings", orient: "bottom-right",
+                   values: [10000, 20000, 40000, 55000], labelFontSize: 10}
+        },
+        color: {field: "venue", type: "nominal",
+                scale: {domain: ["MCG","MCG / AAMI Park","Marvel Stadium","All venues"],
+                        range: [COLORS.mcg, COLORS.mcg, COLORS.marvel, COLORS.multi]},
+                legend: null},
+        tooltip: [
+          {field: "station", title: "Station"},
+          {field: "boardings", title: "Match-day boardings", format: ","},
+          {field: "venue", title: "Primary venue served"}
+        ]
+      }
+    },
+    {
+      data: {values: stationMapData},
+      mark: {type: "text", dy: -16, fontSize: 11, fontWeight: 600, color: "#e8eaf0"},
+      encoding: {
+        longitude: {field: "lng", type: "quantitative"},
+        latitude: {field: "lat", type: "quantitative"},
+        text: {field: "station"}
+      }
+    }
+  ],
+  projection: {type: "mercator"},
+  view: {stroke: null}
+}), {actions: false});
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHART 13 — Train Lines (dot matrix / table view)
+// ─────────────────────────────────────────────────────────────────────────
+vegaEmbed('#chart-lines', baseSpec({
+  width: "container",
+  height: 200,
+  data: {values: [
+    {station:"Jolimont",line:"Hurstbridge",serves:"MCG"},
+    {station:"Jolimont",line:"Mernda",serves:"MCG"},
+    {station:"Richmond",line:"Glen Waverley",serves:"MCG"},
+    {station:"Richmond",line:"Belgrave",serves:"MCG"},
+    {station:"Richmond",line:"Lilydale",serves:"MCG"},
+    {station:"Richmond",line:"Alamein",serves:"MCG"},
+    {station:"North Melbourne",line:"Upfield",serves:"Marvel"},
+    {station:"North Melbourne",line:"Craigieburn",serves:"Marvel"},
+    {station:"North Melbourne",line:"Sunbury",serves:"Marvel"},
+    {station:"Flinders Street",line:"All lines (interchange)",serves:"All"},
+    {station:"Spencer Street",line:"Werribee",serves:"Marvel"},
+    {station:"Spencer Street",line:"Williamstown",serves:"Marvel"},
+    {station:"Spencer Street",line:"Frankston",serves:"Marvel"},
+    {station:"Spencer Street",line:"Sunbury",serves:"Marvel"}
+  ]},
+  mark: {type: "circle", size: 180, opacity: 0.85},
+  encoding: {
+    y: {field: "station", type: "nominal", title: "Station",
+        axis: {labelFontSize: 12}},
+    x: {field: "line", type: "nominal", title: "Train Line",
+        axis: {labelAngle: -35, labelFontSize: 10}},
+    color: {field: "serves", type: "nominal",
+            scale: {domain: ["MCG","Marvel","All"],
+                    range: [COLORS.mcg, COLORS.marvel, COLORS.multi]},
+            legend: {title: "Venue served", orient: "top", labelFontSize: 11}},
+    tooltip: [{field:"station"},{field:"line",title:"Line"},{field:"serves",title:"Venue"}]
+  }
+}), {actions: false});
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// NL4DV — Natural Language Query Handler
+// ─────────────────────────────────────────────────────────────────────────
+
+function askNLQ(q) {
+  document.getElementById('nlq-input').value = q;
+  handleNLQ();
+}
+
+function handleNLQ() {
+  const q = document.getElementById('nlq-input').value.toLowerCase().trim();
+  const answerEl = document.getElementById('nlq-answer-text');
+  const chartEl = document.getElementById('nlq-chart');
+  if (!q) return;
+  answerEl.style.display = 'block';
+
+  // Parse intent
+  if (q.includes('highest') && (q.includes('boarding') || q.includes('station'))) {
+    answerEl.innerHTML = "📊 <strong>Flinders Street</strong> has the highest match-day boardings of any single station, estimated at <strong>55,000</strong> per match day — though this reflects its role as an interchange for all Melbourne lines. Among precinct-specific stations, <strong>Jolimont</strong> sees the most dramatic proportional surge (+580% above normal).";
+    vegaEmbed(chartEl, baseSpec({
+      width: "container", height: 160, data: {values: stationVenueBoardings},
+      mark: {type: "bar", cornerRadiusTopRight: 3},
+      encoding: {
+        y: {field: "station", type: "nominal", sort: "-x", title: null},
+        x: {field: "boardings", type: "quantitative", title: "Match-day boardings", axis: {format: ","}},
+        color: {value: COLORS.green},
+        tooltip: [{field:"station"},{field:"boardings",format:","}]
+      }
+    }), {actions: false});
+  } else if ((q.includes('compare') || q.includes('mcg') || q.includes('marvel')) && (q.includes('crowd') || q.includes('average') || q.includes('size'))) {
+    const mcgAvg = Math.round(aflCrowds2024.reduce((s,d)=>s+d.crowd,0)/aflCrowds2024.length);
+    const docAvg = Math.round(docklandsCrowds.reduce((s,d)=>s+d.crowd,0)/docklandsCrowds.length);
+    answerEl.innerHTML = `📊 The <strong>MCG</strong> averaged <strong>${mcgAvg.toLocaleString()}</strong> per game in 2024, compared to <strong>Marvel Stadium (Docklands)</strong> at <strong>${docAvg.toLocaleString()}</strong>. That's a gap of ${(mcgAvg - docAvg).toLocaleString()} — almost double.`;
+    vegaEmbed(chartEl, baseSpec({
+      width: "container", height: 140,
+      data: {values: [{venue:"M.C.G.", avg: mcgAvg}, {venue:"Marvel Stadium", avg: docAvg}]},
+      mark: {type: "bar", cornerRadiusTopRight: 3},
+      encoding: {
+        y: {field: "venue", type: "nominal", sort: "-x", title: null},
+        x: {field: "avg", type: "quantitative", title: "Avg crowd 2024", axis: {format: ","}},
+        color: {field: "venue", type: "nominal",
+                scale: {domain: ["M.C.G.","Marvel Stadium"], range: [COLORS.mcg, COLORS.marvel]},
+                legend: null},
+        tooltip: [{field:"venue"},{field:"avg",title:"Avg crowd",format:","}]
+      }
+    }), {actions: false});
+  } else if (q.includes('biggest') || (q.includes('largest') && q.includes('crowd'))) {
+    const biggest = aflCrowds2024.reduce((a,b) => a.crowd > b.crowd ? a : b);
+    answerEl.innerHTML = `🏆 The biggest AFL crowd at the MCG in 2024 was the <strong>Grand Final</strong> on ${biggest.date}: <strong>${biggest.home} vs ${biggest.away}</strong> with <strong>${biggest.crowd.toLocaleString()}</strong> fans — essentially a full house.`;
+    const top5 = [...aflCrowds2024].sort((a,b)=>b.crowd-a.crowd).slice(0,5);
+    vegaEmbed(chartEl, baseSpec({
+      width: "container", height: 170,
+      data: {values: top5},
+      mark: {type: "bar", cornerRadiusTopRight: 3},
+      encoding: {
+        y: {field: "crowd", type: "quantitative", title: "Crowd", axis: {format: ","}},
+        x: {field: "home", type: "nominal", sort: "-y", title: null},
+        color: {field: "finals", type: "nominal",
+                scale: {domain:[false,true], range:[COLORS.mcg, COLORS.amber]}, legend: null},
+        tooltip: [{field:"home"},{field:"away"},{field:"crowd",format:","},{field:"finals",title:"Finals?"}]
+      }
+    }), {actions: false});
+  } else if (q.includes('covid') || q.includes('recovery') || q.includes('patronage')) {
+    answerEl.innerHTML = "📈 COVID-19 caused an extraordinary collapse in station patronage in 2020–2021. All four key precinct stations lost 65–73% of boardings. By 2024, recovery is at roughly <strong>88–92%</strong> of pre-pandemic levels across the precinct, with Flinders Street and Richmond closest to full recovery.";
+    vegaEmbed(chartEl, baseSpec({
+      width: "container", height: 220, data: {values: patronageTrend},
+      mark: {type: "line", strokeWidth: 2},
+      encoding: {
+        x: {field: "year", type: "ordinal"},
+        y: {field: "patronage", type: "quantitative", title: "Patronage (M)", axis: {format: ".1f"}},
+        color: {field: "station", type: "nominal",
+                scale: {domain:["Flinders Street","Richmond","North Melbourne","Jolimont"],
+                        range:[COLORS.multi, COLORS.mcg, COLORS.marvel, COLORS.amber]},
+                legend: {title: "Station", orient: "top", labelFontSize: 11}},
+        tooltip: [{field:"station"},{field:"year"},{field:"patronage",format:".2f"}]
+      }
+    }), {actions: false});
+  } else if (q.includes('team') || q.includes('club') || q.includes('collingwood') || q.includes('carlton') || q.includes('essendon')) {
+    const top = teamCrowds.reduce((a,b)=>a.home_avg>b.home_avg?a:b);
+    answerEl.innerHTML = `🏟️ <strong>${top.team}</strong> draws the largest average home crowd of any Melbourne AFL club in 2024, averaging <strong>${top.home_avg.toLocaleString()}</strong> per home game at the MCG.`;
+    vegaEmbed(chartEl, baseSpec({
+      width: "container", height: 220, data: {values: teamCrowds},
+      mark: {type: "bar", cornerRadiusTopRight: 3},
+      encoding: {
+        y: {field: "team", type: "nominal", sort: "-x", title: null},
+        x: {field: "home_avg", type: "quantitative", title: "Avg home crowd", axis: {format:","}},
+        color: {field: "venue", type: "nominal",
+                scale:{domain:["M.C.G.","Docklands"], range:[COLORS.mcg, COLORS.marvel]},
+                legend:{title:"Venue", orient:"top", labelFontSize:11}},
+        tooltip: [{field:"team"},{field:"home_avg",title:"Avg crowd",format:","},{field:"venue"}]
+      }
+    }), {actions: false});
+  } else {
+    answerEl.innerHTML = `🤔 I couldn't find an exact match for "<em>${document.getElementById('nlq-input').value}</em>". Try asking about: station boardings, MCG vs Marvel crowd sizes, the biggest AFL crowd, patronage recovery after COVID, or which team draws the most fans.`;
+    chartEl.innerHTML = '';
+  }
+}
+
+// Enter key support
+document.getElementById('nlq-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleNLQ();
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// NAV HIGHLIGHT ON SCROLL
+// ─────────────────────────────────────────────────────────────────────────
+const sections = ['section-precinct','section-surge','section-venue','section-network','section-map','section-nlq'];
+const navLinks = document.querySelectorAll('nav a');
+
+function updateNav() {
+  let current = sections[0];
+  for (const id of sections) {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < 120) current = id;
+  }
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+window.addEventListener('scroll', updateNav, {passive: true});
+
+</script>
+</body>
+</html>

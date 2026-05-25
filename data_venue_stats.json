@@ -1,0 +1,5 @@
+[
+  {"venue":"M.C.G.","capacity":100024,"suburb":"Richmond","lat":-37.8200,"lng":144.9836,"nearest_station":"Jolimont","station_distance_m":350,"sport":"AFL/Cricket","opened":1853},
+  {"venue":"Marvel Stadium","capacity":56347,"suburb":"Docklands","lat":-37.8165,"lng":144.9475,"nearest_station":"North Melbourne","station_distance_m":800,"sport":"AFL","opened":2000},
+  {"venue":"AAMI Park","capacity":30050,"suburb":"Richmond","lat":-37.8243,"lng":144.9837,"nearest_station":"Jolimont","station_distance_m":450,"sport":"Football/Rugby","opened":2010}
+]
