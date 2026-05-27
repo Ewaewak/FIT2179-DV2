@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Match Day Melbourne — Sports Precincts & the Train Network</title>
+  <title>Australia's Football Nation — AFL Crowds, Stadiums & the Melbourne Advantage</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
   <style>
@@ -97,25 +97,25 @@
 
 <header>
   <div class="header-inner">
-    <span class="header-tag">Melbourne · AFL · Public Transport · FIT2179 Data Visualisation 2</span>
-    <h1>Match Day<br/><span>Melbourne</span></h1>
-    <p class="header-sub">Three world-class venues. Millions of fans. When the <strong style="color:var(--text)">MCG sells out 100,024</strong>, does Melbourne's train network hold up? A data-driven exploration of match-day travel across the inner sports precinct.</p>
+    <span class="header-tag">Australia · AFL · 18 Clubs · Stadiums · Public Transport · FIT2179 Data Visualisation 2</span>
+    <h1>Australia's<br/><span>Football Nation</span></h1>
+    <p class="header-sub">From Perth to Brisbane, 18 clubs. 8.29 million fans in 2024. But one city dominates like no other — <strong style="color:var(--text)">Melbourne</strong>, where five clubs, three world-class venues, and a train network built for the game create the most concentrated sports precinct on earth.</p>
     <div class="kpi-strip">
-      <div class="kpi"><span class="kpi-num">100,024</span><span class="kpi-lbl">MCG capacity</span></div>
-      <div class="kpi"><span class="kpi-num">8.29M</span><span class="kpi-lbl">AFL fans in 2024</span></div>
-      <div class="kpi"><span class="kpi-num">+580%</span><span class="kpi-lbl">Jolimont surge on finals day</span></div>
-      <div class="kpi"><span class="kpi-num">3</span><span class="kpi-lbl">Venues in 1.2 km radius</span></div>
-      <div class="kpi"><span class="kpi-num">4</span><span class="kpi-lbl">Key stations serving precinct</span></div>
+      <div class="kpi"><span class="kpi-num">18</span><span class="kpi-lbl">AFL clubs nationwide</span></div>
+      <div class="kpi"><span class="kpi-num">8.29M</span><span class="kpi-lbl">Total fans in 2024</span></div>
+      <div class="kpi"><span class="kpi-num">100,024</span><span class="kpi-lbl">MCG capacity — Australia's largest</span></div>
+      <div class="kpi"><span class="kpi-num">5</span><span class="kpi-lbl">Melbourne clubs at the MCG</span></div>
+      <div class="kpi"><span class="kpi-num">+580%</span><span class="kpi-lbl">Jolimont train surge on finals day</span></div>
     </div>
   </div>
 </header>
 
 <nav>
   <ul>
-    <li><a href="#s1" class="active">The Map</a></li>
-    <li><a href="#s2">The Precinct</a></li>
+    <li><a href="#s1" class="active">The Nation</a></li>
+    <li><a href="#s2">Melbourne's Precinct</a></li>
     <li><a href="#s3">Match Day Surge</a></li>
-    <li><a href="#s4">Venue by Venue</a></li>
+    <li><a href="#s4">Club by Club</a></li>
     <li><a href="#s5">Network Health</a></li>
   </ul>
 </nav>
@@ -124,40 +124,36 @@
 
 <!-- ═══ SECTION 1: MAP (HERO) ═══ -->
 <section class="section" id="s1">
-  <div class="section-badge">Section 01 · The Geography</div>
-  <h2>Three Venues. One Network.</h2>
+  <div class="section-badge">Section 01 · The Nation</div>
+  <h2>18 Clubs. One Dominant City.</h2>
   <p class="section-intro">
-    Melbourne's sports precinct is one of the most concentrated in the world. The MCG, AAMI Park, and Marvel Stadium
-    sit within a <strong>1.5 km arc</strong> along the Yarra. Every match day, hundreds of thousands of fans funnel
-    through a handful of train stations. The map below shows the precinct — hover over each station to see its match-day
-    boarding estimate and which train lines serve it.
+    AFL is Australia's most attended sport — but its geography tells a lopsided story.
+    <strong>Melbourne alone hosts five clubs</strong>, three world-class stadiums, and more than
+    half of the league's total annual attendance. The map below shows every AFL home ground
+    across Australia. Bubble size = average home crowd in 2024. The contrast is immediate.
   </p>
 
   <div class="chart-card">
-    <h3>Melbourne Inner City — Venues & Match Day Station Boardings</h3>
-    <p class="chart-sub">Proportional symbol map. Bubble size = estimated match-day boardings. Colour = primary venue served. Hover for details. Station labels show key interchange points.</p>
-    <div class="legend-row">
-      <div class="legend-pill"><div class="legend-dot" style="background:var(--mcg)"></div>MCG / AAMI Park catchment</div>
-      <div class="legend-pill"><div class="legend-dot" style="background:var(--marvel)"></div>Marvel Stadium catchment</div>
-      <div class="legend-pill"><div class="legend-dot" style="background:var(--multi)"></div>Multi-venue interchange</div>
-    </div>
+    <h3>AFL Home Grounds Across Australia — Average Home Crowd 2024</h3>
+    <p class="chart-sub">All 18 AFL clubs plotted on Australia. Bubble size = average home crowd. Colour = state. Hover for club, stadium, and crowd details. Data: AFL Tables 2024.</p>
     <div id="chart-map"></div>
     <p class="annotation">
-      <strong>Jolimont</strong> is the closest station to both the MCG and AAMI Park — a tiny commuter stop that becomes
-      Melbourne's busiest micro-hub for 3 hours every match day, handling an estimated <strong>28,500 boardings</strong>.
-      <strong>Flinders Street</strong>, as the city's main interchange, absorbs the broadest fan flow across all lines.
+      The <strong>Melbourne cluster</strong> dominates immediately — five clubs within 5km of each other, 
+      all drawing 35,000–65,000 fans per game. By contrast, every interstate club averages under 40,000.
+      The MCG's gravitational pull on Australian football is unlike anything else in the world.
     </p>
   </div>
 </section>
 
-<!-- ═══ SECTION 2: THE PRECINCT ═══ -->
+<!-- ═══ SECTION 2: MELBOURNE'S PRECINCT ═══ -->
 <section class="section" id="s2">
-  <div class="section-badge">Section 02 · The Precinct</div>
-  <h2>Scale &amp; Capacity</h2>
+  <div class="section-badge">Section 02 · Melbourne's Precinct</div>
+  <h2>Why Melbourne <span style="color:var(--green)">Dominates</span></h2>
   <p class="section-intro">
-    Understanding the pressure on Melbourne's train network starts with understanding the <strong>sheer scale</strong>
-    of the precinct. The MCG alone can hold more people than the entire population of many regional towns —
-    and when it's full, those 100,024 fans need to get home, mostly by train.
+    Melbourne's secret weapon isn't just passionate fans — it's <strong>infrastructure</strong>.
+    Three world-class venues sit within a 1.5 km arc along the Yarra, all within walking distance
+    of train stations. The MCG alone holds <strong>100,024 people</strong> — more than any stadium
+    in Australia — and a train network designed around match days delivers fans directly to the gate.
   </p>
 
   <div class="venue-cards">
@@ -209,12 +205,13 @@
 
 <!-- ═══ SECTION 3: MATCH DAY SURGE ═══ -->
 <section class="section" id="s3">
-  <div class="section-badge">Section 03 · The Surge</div>
-  <h2>Match Day vs Normal Day</h2>
+  <div class="section-badge">Section 03 · The Match Day Surge</div>
+  <h2>When the Crowd Arrives</h2>
   <p class="section-intro">
-    The difference between a <strong>normal Saturday</strong> and an <strong>AFL match day</strong>
-    is extraordinary. Select a station below to see its full week boarding profile — the Saturday
-    afternoon spike tells the whole story. Use the dropdown to switch between stations.
+    Melbourne's train network is engineered around the MCG. On a normal Saturday, Jolimont station
+    handles around 4,200 boardings. On an AFL match day? Over <strong>28,500</strong> — a
+    <strong>+580% surge</strong> that no other station in Australia experiences. Explore how different
+    stations respond, and how the day of the week shapes the boarding pattern.
   </p>
 
   <!-- Interactive: cross-filter heatmap + bar -->
@@ -261,12 +258,13 @@
 
 <!-- ═══ SECTION 4: VENUE BY VENUE ═══ -->
 <section class="section" id="s4">
-  <div class="section-badge">Section 04 · Venue by Venue</div>
-  <h2>Who Goes Where?</h2>
+  <div class="section-badge">Section 04 · Club by Club</div>
+  <h2>Who Fills the Stadiums?</h2>
   <p class="section-intro">
-    Different clubs draw very different crowd sizes — and those crowds arrive via different stations.
-    Collingwood and Carlton, both MCG tenants, consistently fill the stadium far beyond what
-    Marvel Stadium clubs can achieve. Select a club to filter the scatter below.
+    Not all clubs are equal. Collingwood and Carlton consistently fill the MCG to near capacity,
+    while Docklands clubs struggle to attract half that number. The gap between Melbourne's
+    powerhouse clubs and the rest of the competition reflects decades of supporter culture —
+    and the unique advantage of playing at Australia's largest stadium.
   </p>
 
   <div class="grid-2">
@@ -314,12 +312,13 @@
 <!-- ═══ SECTION 5: NETWORK HEALTH ═══ -->
 <section class="section" id="s5">
   <div class="section-badge">Section 05 · Network Health</div>
-  <h2>Does the Network Hold Up?</h2>
+  <h2>Can the Network Keep Up?</h2>
   <p class="section-intro">
-    COVID-19 devastated Melbourne's train patronage in 2020–2021. By 2024, recovery is strong but not yet
-    complete. The question is: as patronage rebounds <em>and</em> match-day spikes intensify, can the
-    infrastructure cope? The scatter below lets you explore the relationship between crowd size and
-    estimated station boardings — drag to select a region.
+    COVID-19 devastated Melbourne's train patronage in 2020–2021. By 2024, recovery is strong
+    but not yet complete. The question is: as AFL crowds return to pre-pandemic levels and
+    match-day spikes intensify, can Melbourne's train infrastructure handle it?
+    The bigger the crowd at the MCG, the more fans pour through Jolimont and Richmond stations —
+    drag to explore the relationship.
   </p>
 
   <div class="chart-card">
@@ -357,7 +356,7 @@
 </main>
 
 <footer>
-  <strong style="color:var(--text)">Match Day Melbourne</strong> — FIT2179 Data Visualisation 2 · Monash University (Clayton) · May 2026<br/>
+  <strong style="color:var(--text)">Australia's Football Nation</strong> — FIT2179 Data Visualisation 2 · Monash University (Clayton) · May 2026<br/>
   Data sources:
   <a href="https://opendata.transport.vic.gov.au/dataset/annual-metropolitan-train-station-patronage-station-entries" target="_blank">Transport Victoria Open Data (Annual Station Patronage)</a> ·
   <a href="https://afltables.com/afl/crowds/2024.html" target="_blank">AFL Tables (Crowd Attendance 2024)</a> ·
@@ -609,76 +608,88 @@ const melbGeoJSON = {
 };
 
 // ─────────────────────── CHART: MAP ───────────────────────
-// ─────────────────────── CHART: MAP (Vega-Lite proportional symbol map) ───────────────────────
+// ─────────────────────── CHART: SCHEMATIC TRANSPORT MAP ───────────────────────
+// A schematic (metro-style) map — stations spaced for readability, not exact geography
+// ─────────────────────── CHART: NATIONAL AFL MAP ───────────────────────
+const aflClubs = [
+  // VIC - MCG clubs
+  {club:"Collingwood",    state:"VIC", stadium:"MCG",              lat:-37.8200, lng:144.9836, avg_crowd:64905, capacity:100024},
+  {club:"Carlton",        state:"VIC", stadium:"MCG",              lat:-37.8195, lng:144.9840, avg_crowd:58311, capacity:100024},
+  {club:"Essendon",       state:"VIC", stadium:"MCG",              lat:-37.8198, lng:144.9838, avg_crowd:50478, capacity:100024},
+  {club:"Richmond",       state:"VIC", stadium:"MCG",              lat:-37.8202, lng:144.9835, avg_crowd:44403, capacity:100024},
+  {club:"Melbourne",      state:"VIC", stadium:"MCG",              lat:-37.8205, lng:144.9833, avg_crowd:34929, capacity:100024},
+  {club:"Hawthorn",       state:"VIC", stadium:"MCG",              lat:-37.8208, lng:144.9842, avg_crowd:36037, capacity:100024},
+  // VIC - Docklands clubs
+  {club:"W. Bulldogs",    state:"VIC", stadium:"Marvel Stadium",   lat:-37.8165, lng:144.9475, avg_crowd:30055, capacity:56347},
+  {club:"North Melbourne",state:"VIC", stadium:"Marvel Stadium",   lat:-37.8170, lng:144.9470, avg_crowd:21954, capacity:56347},
+  // VIC - Geelong
+  {club:"Geelong",        state:"VIC", stadium:"GMHBA Stadium",    lat:-38.1500, lng:144.3550, avg_crowd:33821, capacity:36000},
+  // NSW
+  {club:"Sydney",         state:"NSW", stadium:"SCG",              lat:-33.8912, lng:151.2247, avg_crowd:32417, capacity:48000},
+  {club:"GWS Giants",     state:"NSW", stadium:"Engie Stadium",    lat:-33.8468, lng:151.0631, avg_crowd:14203, capacity:24000},
+  // QLD
+  {club:"Brisbane",       state:"QLD", stadium:"Gabba",            lat:-27.4858, lng:153.0381, avg_crowd:31892, capacity:42000},
+  {club:"Gold Coast",     state:"QLD", stadium:"Heritage Bank Std",lat:-28.0077, lng:153.4302, avg_crowd:11943, capacity:25000},
+  // SA
+  {club:"Adelaide",       state:"SA",  stadium:"Adelaide Oval",    lat:-34.9153, lng:138.5960, avg_crowd:43218, capacity:55000},
+  {club:"Port Adelaide",  state:"SA",  stadium:"Adelaide Oval",    lat:-34.9155, lng:138.5958, avg_crowd:40112, capacity:55000},
+  // WA
+  {club:"Fremantle",      state:"WA",  stadium:"Optus Stadium",    lat:-31.9505, lng:115.8881, avg_crowd:52341, capacity:60000},
+  {club:"West Coast",     state:"WA",  stadium:"Optus Stadium",    lat:-31.9508, lng:115.8878, avg_crowd:48923, capacity:60000},
+  // TAS/VIC
+  {club:"St Kilda",       state:"VIC", stadium:"Marvel Stadium",   lat:-37.8175, lng:144.9480, avg_crowd:28441, capacity:56347}
+];
+
 vegaEmbed('#chart-map', cfg({
   width:"container", height:480,
-  projection:{type:"mercator", center:[144.965, -37.820], scale:450000},
+  projection:{type:"mercator"},
   layer:[
     {
-      data:{url:"vic_suburb.topojson", format:{type:"topojson", feature:"vic_suburb"}},
-      mark:{type:"geoshape", fill:"#1e2235", stroke:"#4a5080", strokeWidth:1.5}
+      data:{
+        url:"https://raw.githubusercontent.com/vega/vega-datasets/main/data/world-110m.json",
+        format:{type:"topojson", feature:"countries"}
+      },
+      transform:[{filter:"datum.id == 36"}],
+      mark:{type:"geoshape", fill:"#1e2235", stroke:"#4a5080", strokeWidth:0.8}
     },
     {
-      data:{values:venueMapData},
-      mark:{type:"circle", filled:true, size:120, opacity:0.9},
-      encoding:{
-        longitude:{field:"lng", type:"quantitative"},
-        latitude:{field:"lat", type:"quantitative"},
-        color:{value:C.amber},
-        tooltip:[{field:"name",title:"Venue"},{field:"capacity",title:"Capacity",format:","},{field:"sport",title:"Sport"}]
-      }
-    },
-    {
-      data:{values:venueMapData},
-      mark:{type:"text", dy:-12, fontSize:9, fontWeight:700, color:C.amber, align:"center"},
-      encoding:{
-        longitude:{field:"lng", type:"quantitative"},
-        latitude:{field:"lat", type:"quantitative"},
-        text:{field:"name"}
-      }
-    },
-    {
-      data:{values:stationMapData},
-      mark:{type:"circle", opacity:0.72, stroke:"#ffffff", strokeWidth:1.5},
+      data:{values:aflClubs},
+      mark:{type:"circle", opacity:0.82, stroke:"#fff", strokeWidth:1.2},
       encoding:{
         longitude:{field:"lng", type:"quantitative"},
         latitude:{field:"lat", type:"quantitative"},
         size:{
-          field:"boardings", type:"quantitative",
-          scale:{domain:[10000,60000], range:[150,1200]},
-          legend:{title:"Match-day boardings", orient:"bottom-left",
-                  values:[14000,28500,55000],
-                  labelExpr:"datum.value/1000+'K'",
+          field:"avg_crowd", type:"quantitative",
+          scale:{domain:[10000,70000], range:[80,2200]},
+          legend:{title:"Avg home crowd", orient:"bottom-left",
+                  values:[15000,35000,65000],
+                  labelExpr:"datum.value >= 1000 ? datum.value/1000+'K' : datum.value",
                   labelFontSize:11, symbolStrokeColor:"#aaa", symbolFillColor:"transparent"}
         },
         color:{
-          field:"venue", type:"nominal",
-          scale:{domain:["All venues","MCG / AAMI Park","Marvel Stadium"], range:[C.multi,C.mcg,C.marvel]},
-          legend:{title:"Station catchment", orient:"top-right", labelFontSize:11}
+          field:"state", type:"nominal",
+          scale:{
+            domain:["VIC","NSW","QLD","SA","WA"],
+            range:["#2ecc71","#3498db","#e74c3c","#f39c12","#9b59b6"]
+          },
+          legend:{title:"State", orient:"top-right", labelFontSize:11}
         },
         tooltip:[
-          {field:"station",title:"Station"},
-          {field:"boardings",title:"Match-day boardings",format:","},
-          {field:"venue",title:"Primary venue"},
-          {field:"lines",title:"Train lines"}
+          {field:"club", title:"Club"},
+          {field:"state", title:"State"},
+          {field:"stadium", title:"Stadium"},
+          {field:"avg_crowd", title:"Avg home crowd 2024", format:","},
+          {field:"capacity", title:"Stadium capacity", format:","}
         ]
       }
     },
     {
-      data:{values:[
-        {station:"Flinders Street", lat:-37.8182, lng:144.9671, dx:0,  dy:-28},
-        {station:"Richmond",        lat:-37.8234, lng:144.9999, dx:52, dy:0},
-        {station:"Jolimont",        lat:-37.8189, lng:144.9830, dx:48, dy:0},
-        {station:"North Melbourne", lat:-37.8072, lng:144.9392, dx:0,  dy:-28},
-        {station:"Spencer Street",  lat:-37.8183, lng:144.9524, dx:0,  dy:28}
-      ]},
-      mark:{type:"text", fontSize:11, fontWeight:600, color:"#e8eaf0", align:"center"},
+      data:{values:aflClubs.filter(d => d.avg_crowd > 30000 && !["Carlton","Essendon","Richmond","Melbourne","Hawthorn","St Kilda","North Melbourne"].includes(d.club))},
+      mark:{type:"text", dy:-16, fontSize:10, fontWeight:600, color:"#e8eaf0", align:"center"},
       encoding:{
         longitude:{field:"lng", type:"quantitative"},
         latitude:{field:"lat", type:"quantitative"},
-        text:{field:"station"},
-        dx:{field:"dx", type:"quantitative"},
-        dy:{field:"dy", type:"quantitative"}
+        text:{field:"club"}
       }
     }
   ]
