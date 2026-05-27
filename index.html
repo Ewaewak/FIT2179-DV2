@@ -619,11 +619,11 @@ vegaEmbed('#chart-map', cfg({
         url:"vic_suburb.topojson",
         format:{type:"topojson", feature:"vic_suburb"}
       },
-      mark:{type:"geoshape", fill:"#1a1d2b", stroke:"#2e3355", strokeWidth:0.8}
+      mark:{type:"geoshape", fill:"#1e2235", stroke:"#3d4570", strokeWidth:1.2}
     },
     {
       data:{values:venueMapData},
-      mark:{type:"point", shape:"square", filled:true, size:200, opacity:0.95},
+      mark:{type:"circle", filled:true, size:180, opacity:0.95},
       encoding:{
         longitude:{field:"lng", type:"quantitative"},
         latitude:{field:"lat", type:"quantitative"},
@@ -653,10 +653,13 @@ vegaEmbed('#chart-map', cfg({
         size:{
           field:"boardings", type:"quantitative",
           scale:{domain:[10000,60000], range:[200,1800]},
-          legend:{title:"Match-day boardings", orient:"bottom-right",
-                  values:[14000,21000,28500,55000],
+          legend:{title:"Match-day boardings", orient:"bottom-left",
+                  values:[14000,28500,55000],
                   labelExpr:"datum.value/1000+'K'",
-                  labelFontSize:11, symbolFillColor:"#555", symbolStrokeColor:"#aaa"}
+                  labelFontSize:11,
+                  symbolOpacity:0.5,
+                  symbolStrokeColor:"#aaa",
+                  symbolFillColor:"transparent"}
         },
         color:{
           field:"venue", type:"nominal",
