@@ -1,0 +1,70 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Horizontal bar chart comparing capacities of Melbourne's three major sporting venues.",
+  "width": "container",
+  "height": 130,
+  "data": {
+    "values": [
+      {
+        "venue": "M.C.G.",
+        "capacity": 100024
+      },
+      {
+        "venue": "Marvel Stadium",
+        "capacity": 56347
+      },
+      {
+        "venue": "AAMI Park",
+        "capacity": 30050
+      }
+    ]
+  },
+  "mark": {
+    "type": "bar",
+    "cornerRadiusTopRight": 3,
+    "cornerRadiusBottomRight": 3
+  },
+  "encoding": {
+    "y": {
+      "field": "venue",
+      "type": "nominal",
+      "sort": "-x",
+      "title": null
+    },
+    "x": {
+      "field": "capacity",
+      "type": "quantitative",
+      "title": "Capacity",
+      "axis": {
+        "labelExpr": "format(datum.value, ',')"
+      }
+    },
+    "color": {
+      "field": "venue",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "M.C.G.",
+          "Marvel Stadium",
+          "AAMI Park"
+        ],
+        "range": [
+          "#4caf50",
+          "#1976d2",
+          "#f57c00"
+        ]
+      },
+      "legend": null
+    },
+    "tooltip": [
+      {
+        "field": "venue"
+      },
+      {
+        "field": "capacity",
+        "title": "Capacity",
+        "format": ","
+      }
+    ]
+  }
+}

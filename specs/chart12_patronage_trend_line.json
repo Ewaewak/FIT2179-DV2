@@ -1,0 +1,124 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Multi-line area chart showing annual patronage recovery 2017-2024 at key Melbourne stations. Filterable by station via dropdown. Data source: Transport Victoria Annual Station Patronage.",
+  "width": "container",
+  "height": 250,
+  "data": {
+    "url": "data_station_patronage.json"
+  },
+  "encoding": {
+    "x": {
+      "field": "year",
+      "type": "ordinal",
+      "title": "Year"
+    },
+    "y": {
+      "field": "patronage",
+      "type": "quantitative",
+      "title": "Patronage (M)",
+      "axis": {
+        "format": ".1f"
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "area",
+        "opacity": 0.12
+      },
+      "encoding": {
+        "color": {
+          "field": "station",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "Flinders Street",
+              "Richmond",
+              "North Melbourne",
+              "Jolimont"
+            ],
+            "range": [
+              "#9b59b6",
+              "#4caf50",
+              "#1976d2",
+              "#f39c12"
+            ]
+          },
+          "legend": {
+            "title": "Station",
+            "orient": "top"
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "line",
+        "strokeWidth": 2.5
+      },
+      "encoding": {
+        "color": {
+          "field": "station",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "Flinders Street",
+              "Richmond",
+              "North Melbourne",
+              "Jolimont"
+            ],
+            "range": [
+              "#9b59b6",
+              "#4caf50",
+              "#1976d2",
+              "#f39c12"
+            ]
+          },
+          "legend": null
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 60
+      },
+      "encoding": {
+        "color": {
+          "field": "station",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "Flinders Street",
+              "Richmond",
+              "North Melbourne",
+              "Jolimont"
+            ],
+            "range": [
+              "#9b59b6",
+              "#4caf50",
+              "#1976d2",
+              "#f39c12"
+            ]
+          },
+          "legend": null
+        },
+        "tooltip": [
+          {
+            "field": "station"
+          },
+          {
+            "field": "year"
+          },
+          {
+            "field": "patronage",
+            "title": "Patronage (M)",
+            "format": ".2f"
+          }
+        ]
+      }
+    }
+  ]
+}

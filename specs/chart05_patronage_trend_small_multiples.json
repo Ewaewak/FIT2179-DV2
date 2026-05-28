@@ -1,0 +1,134 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Small multiples showing annual patronage trend 2017-2024 for four Melbourne stations. COVID-19 collapse visible at 2020. Data source: Transport Victoria.",
+  "width": 200,
+  "height": 130,
+  "data": {
+    "url": "data_station_patronage.json"
+  },
+  "facet": {
+    "field": "station",
+    "type": "nominal",
+    "columns": 4,
+    "header": {
+      "labelFont": "DM Sans",
+      "labelFontSize": 12,
+      "labelFontWeight": 600
+    }
+  },
+  "resolve": {
+    "scale": {
+      "y": "independent"
+    }
+  },
+  "spec": {
+    "width": 200,
+    "height": 130,
+    "layer": [
+      {
+        "mark": {
+          "type": "area",
+          "opacity": 0.15
+        },
+        "encoding": {
+          "x": {
+            "field": "year",
+            "type": "ordinal",
+            "axis": {
+              "labelFontSize": 9,
+              "labelAngle": -45
+            }
+          },
+          "y": {
+            "field": "patronage",
+            "type": "quantitative",
+            "title": "Boardings",
+            "axis": {
+              "format": "~s",
+              "labelFontSize": 9
+            }
+          },
+          "color": {
+            "field": "station",
+            "type": "nominal",
+            "scale": {
+              "domain": [
+                "Flinders Street",
+                "Richmond",
+                "North Melbourne",
+                "Jolimont"
+              ],
+              "range": [
+                "#9b59b6",
+                "#4caf50",
+                "#1976d2",
+                "#f39c12"
+              ]
+            },
+            "legend": null
+          }
+        }
+      },
+      {
+        "mark": {
+          "type": "line",
+          "strokeWidth": 2
+        },
+        "encoding": {
+          "x": {
+            "field": "year",
+            "type": "ordinal"
+          },
+          "y": {
+            "field": "patronage",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "station",
+            "type": "nominal",
+            "scale": {
+              "domain": [
+                "Flinders Street",
+                "Richmond",
+                "North Melbourne",
+                "Jolimont"
+              ],
+              "range": [
+                "#9b59b6",
+                "#4caf50",
+                "#1976d2",
+                "#f39c12"
+              ]
+            },
+            "legend": null
+          }
+        }
+      },
+      {
+        "mark": {
+          "type": "rule",
+          "strokeDash": [
+            3,
+            2
+          ],
+          "strokeWidth": 1,
+          "color": "#e74c3c",
+          "opacity": 0.7
+        },
+        "data": {
+          "values": [
+            {
+              "year": 2020
+            }
+          ]
+        },
+        "encoding": {
+          "x": {
+            "field": "year",
+            "type": "ordinal"
+          }
+        }
+      }
+    ]
+  }
+}

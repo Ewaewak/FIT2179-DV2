@@ -1,0 +1,68 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Grouped bar chart comparing estimated match-day vs normal Saturday boardings at key Melbourne stations. Data source: Transport Victoria.",
+  "width": "container",
+  "height": 230,
+  "data": {
+    "url": "data_match_boardings.json"
+  },
+  "mark": {
+    "type": "bar",
+    "cornerRadiusTopRight": 2
+  },
+  "encoding": {
+    "y": {
+      "field": "station",
+      "type": "nominal",
+      "sort": [
+        "-x"
+      ],
+      "title": null
+    },
+    "x": {
+      "field": "boardings",
+      "type": "quantitative",
+      "title": "Estimated boardings (thousands)",
+      "axis": {
+        "labelExpr": "datum.value/1000+'K'",
+        "tickCount": 6
+      }
+    },
+    "color": {
+      "field": "type",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Match Day Saturday",
+          "Normal Saturday"
+        ],
+        "range": [
+          "#2ecc71",
+          "#2a2e45"
+        ]
+      },
+      "legend": {
+        "orient": "top",
+        "title": null
+      }
+    },
+    "yOffset": {
+      "field": "type",
+      "type": "nominal"
+    },
+    "tooltip": [
+      {
+        "field": "station"
+      },
+      {
+        "field": "type",
+        "title": "Day type"
+      },
+      {
+        "field": "boardings",
+        "title": "Est. boardings",
+        "format": ","
+      }
+    ]
+  }
+}

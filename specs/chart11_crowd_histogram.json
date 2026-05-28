@@ -1,0 +1,71 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Histogram of AFL crowd sizes at Melbourne venues in 2024. Drag to brush-select a range. Data source: AFL Tables 2024.",
+  "width": "container",
+  "height": 200,
+  "data": {
+    "url": "data_afl_crowds_2024.json"
+  },
+  "params": [
+    {
+      "name": "brush",
+      "select": {
+        "type": "interval",
+        "encodings": [
+          "x"
+        ]
+      }
+    }
+  ],
+  "mark": {
+    "type": "bar",
+    "binSpacing": 1,
+    "cornerRadiusTopLeft": 2,
+    "cornerRadiusTopRight": 2
+  },
+  "encoding": {
+    "x": {
+      "field": "crowd",
+      "type": "quantitative",
+      "bin": {
+        "step": 8000
+      },
+      "title": "Crowd size",
+      "axis": {
+        "labelExpr": "format(datum.value, ',')"
+      }
+    },
+    "y": {
+      "aggregate": "count",
+      "type": "quantitative",
+      "title": "Number of matches"
+    },
+    "color": {
+      "field": "venue",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "M.C.G.",
+          "Docklands",
+          "AAMI Park"
+        ],
+        "range": [
+          "#4caf50",
+          "#1976d2",
+          "#f57c00"
+        ]
+      },
+      "legend": {
+        "title": "Venue",
+        "orient": "top"
+      }
+    },
+    "opacity": {
+      "condition": {
+        "param": "brush",
+        "value": 1
+      },
+      "value": 0.4
+    }
+  }
+}

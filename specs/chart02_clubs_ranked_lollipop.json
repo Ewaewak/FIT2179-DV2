@@ -1,0 +1,110 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Lollipop chart ranking all 18 AFL clubs by average home crowd in 2024. Green = Melbourne clubs, grey = interstate. Data source: AFL Tables 2024.",
+  "width": "container",
+  "height": 360,
+  "data": {
+    "url": "data_afl_clubs.json"
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "rule",
+        "strokeWidth": 2,
+        "opacity": 0.5
+      },
+      "encoding": {
+        "y": {
+          "field": "club",
+          "type": "nominal",
+          "sort": {
+            "field": "avg_crowd",
+            "order": "descending"
+          },
+          "title": null
+        },
+        "x": {
+          "field": "avg_crowd",
+          "type": "quantitative",
+          "title": "Average home crowd 2024",
+          "axis": {
+            "labelExpr": "datum.value/1000+'K'"
+          }
+        },
+        "x2": {
+          "value": 0
+        },
+        "color": {
+          "field": "melbourne",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              true,
+              false
+            ],
+            "range": [
+              "#2ecc71",
+              "#7a80a0"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 130,
+        "opacity": 0.95
+      },
+      "encoding": {
+        "y": {
+          "field": "club",
+          "type": "nominal",
+          "sort": {
+            "field": "avg_crowd",
+            "order": "descending"
+          },
+          "title": null
+        },
+        "x": {
+          "field": "avg_crowd",
+          "type": "quantitative"
+        },
+        "color": {
+          "field": "melbourne",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              true,
+              false
+            ],
+            "range": [
+              "#2ecc71",
+              "#7a80a0"
+            ]
+          },
+          "legend": {
+            "title": "Club base",
+            "labelExpr": "datum.value ? 'Melbourne club' : 'Interstate club'"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "club",
+            "title": "Club"
+          },
+          {
+            "field": "state",
+            "title": "State"
+          },
+          {
+            "field": "avg_crowd",
+            "title": "Avg home crowd",
+            "format": ","
+          }
+        ]
+      }
+    }
+  ]
+}

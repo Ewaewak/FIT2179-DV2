@@ -1,0 +1,69 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Scatter plot of home average vs away average crowd for each AFL club. Points above the diagonal line draw bigger crowds at home. Data source: AFL Tables 2024.",
+  "width": "container",
+  "height": 280,
+  "data": {
+    "url": "data_team_crowds.json"
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 220,
+        "opacity": 0.9
+      },
+      "encoding": {
+        "x": {
+          "field": "home_avg",
+          "type": "quantitative",
+          "title": "Avg home crowd",
+          "axis": {
+            "labelExpr": "format(datum.value, ',')"
+          }
+        },
+        "y": {
+          "field": "away_avg",
+          "type": "quantitative",
+          "title": "Avg away crowd",
+          "axis": {
+            "labelExpr": "format(datum.value, ',')"
+          }
+        },
+        "color": {
+          "field": "venue",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "M.C.G.",
+              "Docklands"
+            ],
+            "range": [
+              "#4caf50",
+              "#1976d2"
+            ]
+          },
+          "legend": {
+            "title": "Home venue"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "team"
+          },
+          {
+            "field": "home_avg",
+            "title": "Home avg",
+            "format": ","
+          },
+          {
+            "field": "away_avg",
+            "title": "Away avg",
+            "format": ","
+          }
+        ]
+      }
+    }
+  ]
+}

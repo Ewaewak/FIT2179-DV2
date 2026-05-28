@@ -1,0 +1,65 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Horizontal bar chart of average home crowd per AFL club in 2024. Coloured by home venue (MCG vs Docklands). Data source: AFL Tables 2024.",
+  "width": "container",
+  "height": 240,
+  "data": {
+    "url": "data_team_crowds.json"
+  },
+  "mark": {
+    "type": "bar",
+    "cornerRadiusTopRight": 3
+  },
+  "encoding": {
+    "y": {
+      "field": "team",
+      "type": "nominal",
+      "sort": "-x",
+      "title": null
+    },
+    "x": {
+      "field": "home_avg",
+      "type": "quantitative",
+      "title": "Avg home crowd",
+      "axis": {
+        "labelExpr": "format(datum.value, ',')"
+      }
+    },
+    "color": {
+      "field": "venue",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "M.C.G.",
+          "Docklands"
+        ],
+        "range": [
+          "#4caf50",
+          "#1976d2"
+        ]
+      },
+      "legend": {
+        "title": "Home venue",
+        "orient": "top"
+      }
+    },
+    "tooltip": [
+      {
+        "field": "team"
+      },
+      {
+        "field": "home_avg",
+        "title": "Avg home crowd",
+        "format": ","
+      },
+      {
+        "field": "away_avg",
+        "title": "Avg away crowd",
+        "format": ","
+      },
+      {
+        "field": "venue"
+      }
+    ]
+  }
+}

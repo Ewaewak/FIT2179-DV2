@@ -1,0 +1,61 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Dot plot of every MCG match crowd in the 2024 AFL season. Finals highlighted in amber. Dropdown allows comparison with Marvel Stadium and AAMI Park. Data source: AFL Tables 2024.",
+  "width": "container",
+  "height": 220,
+  "data": {
+    "url": "data_afl_crowds_2024.json"
+  },
+  "encoding": {
+    "x": {
+      "field": "crowd",
+      "type": "quantitative",
+      "title": "Attendance",
+      "axis": {
+        "labelExpr": "format(datum.value, ',')"
+      },
+      "scale": {
+        "zero": false
+      }
+    },
+    "y": {
+      "field": "rnum",
+      "type": "quantitative",
+      "title": "Round",
+      "axis": {
+        "tickCount": 8,
+        "labelExpr": "datum.value"
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 90,
+        "opacity": 0.78
+      },
+      "encoding": {
+        "color": {
+          "field": "finals",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              false,
+              true
+            ],
+            "range": [
+              "#4caf50",
+              "#f39c12"
+            ]
+          },
+          "legend": {
+            "title": "Type",
+            "labelExpr": "datum.value ? 'Finals' : 'Regular season'"
+          }
+        }
+      }
+    }
+  ]
+}

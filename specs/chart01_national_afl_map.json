@@ -1,0 +1,124 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Proportional symbol map of all 18 AFL clubs across Australia. Bubble size = average home crowd 2024. Colour = state. Data source: AFL Tables 2024 (https://afltables.com/afl/crowds/2024.html)",
+  "width": "container",
+  "height": 460,
+  "projection": {
+    "type": "mercator"
+  },
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/world-110m.json",
+        "format": {
+          "type": "topojson",
+          "feature": "countries"
+        }
+      },
+      "transform": [
+        {
+          "filter": "datum.id == 36"
+        }
+      ],
+      "mark": {
+        "type": "geoshape",
+        "fill": "#1e2235",
+        "stroke": "#4a5080",
+        "strokeWidth": 0.8
+      }
+    },
+    {
+      "data": {
+        "url": "data_afl_clubs.json"
+      },
+      "mark": {
+        "type": "circle",
+        "opacity": 0.82,
+        "stroke": "#fff",
+        "strokeWidth": 1.2
+      },
+      "encoding": {
+        "longitude": {
+          "field": "lng",
+          "type": "quantitative"
+        },
+        "latitude": {
+          "field": "lat",
+          "type": "quantitative"
+        },
+        "size": {
+          "field": "avg_crowd",
+          "type": "quantitative",
+          "scale": {
+            "domain": [
+              10000,
+              70000
+            ],
+            "range": [
+              50,
+              700
+            ]
+          },
+          "legend": {
+            "title": "Avg home crowd",
+            "orient": "bottom-left",
+            "values": [
+              15000,
+              35000,
+              65000
+            ],
+            "labelExpr": "datum.value/1000+'K'"
+          }
+        },
+        "color": {
+          "field": "state",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "VIC",
+              "NSW",
+              "QLD",
+              "SA",
+              "WA"
+            ],
+            "range": [
+              "#2ecc71",
+              "#3498db",
+              "#e74c3c",
+              "#f39c12",
+              "#9b59b6"
+            ]
+          },
+          "legend": {
+            "title": "State",
+            "orient": "top-right"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "club",
+            "title": "Club"
+          },
+          {
+            "field": "state",
+            "title": "State"
+          },
+          {
+            "field": "stadium",
+            "title": "Stadium"
+          },
+          {
+            "field": "avg_crowd",
+            "title": "Avg crowd",
+            "format": ","
+          },
+          {
+            "field": "capacity",
+            "title": "Capacity",
+            "format": ","
+          }
+        ]
+      }
+    }
+  ]
+}

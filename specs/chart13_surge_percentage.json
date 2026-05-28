@@ -1,0 +1,123 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Horizontal bar chart showing match-day boarding surge percentage above normal Saturday volume at key Melbourne stations. Data source: Transport Victoria.",
+  "width": "container",
+  "height": 220,
+  "data": {
+    "values": [
+      {
+        "station": "Jolimont",
+        "surge_pct": 580,
+        "normal": 4200,
+        "matchday": 28500
+      },
+      {
+        "station": "North Melbourne",
+        "surge_pct": 203,
+        "normal": 6100,
+        "matchday": 18500
+      },
+      {
+        "station": "Richmond",
+        "surge_pct": 75,
+        "normal": 12000,
+        "matchday": 21000
+      },
+      {
+        "station": "Spencer Street",
+        "surge_pct": 60,
+        "normal": 8900,
+        "matchday": 14200
+      },
+      {
+        "station": "Flinders Street",
+        "surge_pct": 45,
+        "normal": 38000,
+        "matchday": 55000
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "bar",
+        "cornerRadiusTopRight": 3
+      },
+      "encoding": {
+        "y": {
+          "field": "station",
+          "type": "nominal",
+          "sort": "-x",
+          "title": null
+        },
+        "x": {
+          "field": "surge_pct",
+          "type": "quantitative",
+          "title": "% above normal Saturday",
+          "axis": {
+            "labelExpr": "datum.value+'%'"
+          }
+        },
+        "color": {
+          "field": "surge_pct",
+          "type": "quantitative",
+          "scale": {
+            "scheme": "greens",
+            "domain": [
+              40,
+              600
+            ]
+          },
+          "legend": {
+            "title": "Surge %",
+            "labelExpr": "datum.value+'%'"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "station"
+          },
+          {
+            "field": "surge_pct",
+            "title": "Surge %"
+          },
+          {
+            "field": "matchday",
+            "title": "Match-day boardings",
+            "format": ","
+          },
+          {
+            "field": "normal",
+            "title": "Normal Saturday",
+            "format": ","
+          }
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 5,
+        "fontSize": 11,
+        "fontWeight": 700,
+        "color": "#2ecc71"
+      },
+      "encoding": {
+        "y": {
+          "field": "station",
+          "type": "nominal",
+          "sort": "-x"
+        },
+        "x": {
+          "field": "surge_pct",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "surge_pct",
+          "format": ".0f"
+        }
+      }
+    }
+  ]
+}

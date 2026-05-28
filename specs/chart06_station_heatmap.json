@@ -1,0 +1,73 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Heatmap of estimated boardings by day of week and time period at Richmond station. Saturday afternoon surge shows AFL match day impact. Data source: Transport Victoria.",
+  "width": "container",
+  "height": 210,
+  "data": {
+    "url": "data_heatmap.json"
+  },
+  "mark": {
+    "type": "rect"
+  },
+  "encoding": {
+    "x": {
+      "field": "period",
+      "type": "ordinal",
+      "sort": [
+        "6-9am",
+        "9-12pm",
+        "12-3pm",
+        "3-6pm",
+        "6-9pm"
+      ],
+      "title": "Time period"
+    },
+    "y": {
+      "field": "day",
+      "type": "ordinal",
+      "sort": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "title": null
+    },
+    "color": {
+      "field": "boardings",
+      "type": "quantitative",
+      "title": "Boardings",
+      "scale": {
+        "range": [
+          "#1a1d2b",
+          "#1a4a7a",
+          "#2196f3",
+          "#f39c12",
+          "#e74c3c"
+        ]
+      },
+      "legend": {
+        "gradientLength": 140,
+        "labelExpr": "datum.value >= 1000 ? datum.value/1000+'K' : datum.value"
+      }
+    },
+    "tooltip": [
+      {
+        "field": "day",
+        "title": "Day"
+      },
+      {
+        "field": "period",
+        "title": "Time"
+      },
+      {
+        "field": "boardings",
+        "title": "Est. boardings",
+        "format": ","
+      }
+    ]
+  }
+}
